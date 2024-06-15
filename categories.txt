@@ -1,0 +1,103 @@
+Categories: [ brand, negotiable ]
+
+    Electronics [ condition, voltage rating, power in watts,  color ]
+        Home & Kitchen Appliances [ capacity ]
+        Tvs [ size, scratches ]
+        Fridges [ capacity, scratches ]
+        Parts & Accessories
+        Wiring & Electrical Installation [ size ]
+
+    Vehicles & Tracks [ condition, color, year of make, engine size, horse power, torque, fuel, fuel tank capacity, scratches, faults, steering, transmision ]
+        Cars & SUVs [ sitting capacity, boot size, wheel size ]
+        Pickups [ sitting capacity, boot size, wheel size, load capacity ]
+        Buses [ sitting capacity, boot size, wheel size ]
+        Tracks & Trailers [ wheel size, trailers ]
+        Tractors & Heavy Equipments [ wheel size, load capacity ]
+        Parts & Accessories
+
+    Machinary [ condition, voltage rating, power, ac/dc, surface area ]
+        Manufacturing
+        Agriculture
+        Building & Construction
+
+    Funiture [ condition, wood type, color, size, damages]
+        Chairs & Table
+        Kitchen
+        Office
+        Kids
+        Shop
+
+    Property & Real Estates [ condition, surface area ]
+        Houses & Appartments for Rent [ selfcontained, toilets, bathrooms, bedrooms, kitchen, compound, floors ]
+        Houses & Appartments for Sale [ selfcontained, toilets, bathrooms, bedrooms, kitchen, compound, floors, Land Title ]
+        Land & Plots for Sale [ Land Title, Land Texture ]
+        Space for Rent
+
+    Fashion [ condition, size, color, Machine wash ]
+        Female
+        Male
+        Shoes
+        Children & Babies 
+        Jewlery & Wearables [ make, material ]
+
+    Services [ Category ]
+        Jobs [ type, site, ]
+        CVs
+        Repairs
+        Medical
+        Engineering
+        Education
+        IT
+        Business
+        Other
+
+    Computers [ condition, make, color ]
+        Laptops [ ram, rom, procesor, speed, screen size, usb ports, battery capacity, external Battery, scratches ]
+        Desktops [ ram, rom, procesor, speed, screen size, usb ports, scratches ]
+        Robots 
+        Accessories
+
+    Phones & Tablets [ condition, screen size, ram, rom, color, scratches ]
+        Cell Phones [ sim card slot, card size, battery capacity, battery size, battery type ]
+        Tablets [ sim card slot, card size, battery capacity, battery size, battery type ]
+        Accessories
+
+    Art & Craft [ condition ]
+
+    Education
+        Books and Novels [ pages ]
+        Scholastic
+        
+    Stationary
+        Paper
+        Equipments
+
+    Health & Beauty [ age, gender ]
+        Cosmetics [ skin type ]
+        Perfumes [ skin type ]
+        Makeup [ skin type ]
+        Gym 
+
+    Finance [ ]
+        Stocks
+        Banking
+        Credits & Loans
+
+    Food & Agriculture
+        Agriculture Products
+        Domestic Food
+        Restaurants
+
+    Tools & Gadgets [ condition, make, year, faults, condition ]
+        Domestic
+        Drones
+        Robots
+        Industrial
+    
+    Leisure & Kid's Play [ condition ]
+        play Station
+        Toys
+        Play Ground
+
+
+
