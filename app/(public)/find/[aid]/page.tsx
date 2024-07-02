@@ -3,19 +3,37 @@ import AdCard from '@/components/AdCard'
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import { Button } from '@/components/ui/button'
-import { ads } from '@/lib/dami-api'
+import { fetchAdByID, fetchAds } from '@/lib/db/api'
+import { createClient } from '@/lib/supabase/server'
 import { Check, Star } from 'lucide-react'
+import { cookies } from 'next/headers'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {
-  params: any
+  params: any,
+  searchParams: any
 }
 
-export default function page({ params }: Props) {
+export default async function page({ params, searchParams }: Props) {
   const aid = params.aid
-  const ad = ads.find((a) => a.id === aid )
+  const supabase = createClient(cookies())
+  const ad = await fetchAdByID(supabase, aid)
+  const ads = await fetchAds(supabase)
+
+  // console.log(ad)
+
+  const numberOrZer0 = (str: string) => {
+    const index =  Number.isNaN(parseInt(str)) ? 1 : parseInt(str)
+    return index > ad?.ad_images?.length! ? 1 : index
+  }
+
+  console.log(numberOrZer0(searchParams['img']))
+
+  if(!ad){
+    return null
+  }
   const details = JSON.parse(ad?.ad_details || '');
 
   const handleDetails = () => {
@@ -53,22 +71,28 @@ export default function page({ params }: Props) {
       <SearchBar includeLocation />
       <div className='sm:flex sm:space-x-5 mt-5'>
         <div className="bg-secondary w-full sm:w-[60%] xl:w-[50%]">
-          <Image 
-            src={ ad?.ad_images[0]?.url || ''} 
-            alt='Priority Ad Image' 
-            height={100} width={100} 
-            className='w-full max-w-60 mx-auto hover:scale-150 transition-all h-auto' 
-          />
+          <div className="p-5 w-full h-[50vh]">
+            {
+              ad.ad_images &&
+              <Image 
+                src={ ad.ad_images[numberOrZer0(searchParams['img'])-1]?.url ?? ''} 
+                alt='Priority Ad Image' 
+                height={1500} width={1500} 
+                className='w-full mx-auto hover:scale-110 rounded-sm transition-all h-auto' 
+              />
+            }
+          </div>
           <div className="flex border-t p-2 h-24 overflow-hidden space-x-2">
             {
-              ad?.ad_images.map((image, index)=>(
-                <Image 
-                  key={ index }
-                  src={ image?.url || ''} 
-                  alt='Priority Ad Image' 
-                  height={100} width={100} 
-                  className='w-full max-w-24 border h-auto' 
-                />
+              ad?.ad_images?.map((image, index)=>(
+                <Link key={ index } href={`?img=${index+1}`} className='block h-full'>
+                  <Image 
+                    src={ image?.url || ''} 
+                    alt='Priority Ad Image' 
+                    height={100} width={100} 
+                    className='w-full max-w-24 border h-auto' 
+                  />
+                </Link>
               ))
             }
           </div>
@@ -99,7 +123,7 @@ export default function page({ params }: Props) {
               <Image 
                 src={'/profile.jpg'} alt='Seller Image' height={100} width={100} 
                 className='rounded-full mx-auto' />
-              <h1 className="text-lg text-center pt-2">ELLY DOT SERVICES</h1>
+              <h1 className="text-lg text-center pt-2">{ ad.profiles?.first_name } { ad.profiles?.last_name }</h1>
               <div className="flex justify-evenly py-2 w-full">
                 <p className="text-foreground/50 w-fit">6 ads</p>
                 <div className="w-fit flex text-yellow-500">

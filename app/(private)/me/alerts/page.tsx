@@ -1,10 +1,8 @@
 "use client"
 
-import { alerts } from '@/lib/dami-api'
 import { today, yesterday } from '@/lib/utils'
 import React, { useEffect, useState } from 'react'
 import Folder from './Folder'
-import { stringify } from 'querystring'
 import { Notification } from '@/lib/types'
 
 type Props = {}
@@ -14,7 +12,7 @@ export default function AlertsPage({}: Props) {
   const [alertState, setAlertState] = useState<Notification[]>([])
 
   useEffect(()=>{
-    setAlertState(alerts)
+    setAlertState([])
   }, [])
 
   const todayFolder = alertState.filter((alert)=> alert.date.toDateString() === today.toDateString())
@@ -22,7 +20,7 @@ export default function AlertsPage({}: Props) {
   const olderFolder = alertState.filter((alert) => alert.date.toDateString() !== today.toDateString() && alert.date.toDateString() !== yesterday.toDateString())
 
   const setRead = (alertID: string) => {
-    const updatedAlerts = alerts.map(alert => {
+    const updatedAlerts = alertState.map(alert => {
       if(alert.id === alertID){
         alert.status = 'Read'
       }

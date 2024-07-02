@@ -17,8 +17,8 @@
 
 export type Profile = {
     id: string,
-    firstName?: string,
-    lastName?: string,
+    first_name?: string,
+    last_name?: string,
     image?: string,
     address?: string,
     about?: string,
@@ -70,17 +70,23 @@ export type Ad = {
     trashed_at?: string,
     ad_details?: string,
     location?: string,
-    pricing_scheme?: "Fixed" | "Price Range" | "Periodic",
+    pricing_scheme?: string, // "Fixed" | "Price Range" | "Periodic",
     min_price?: number,
     max_price?: number,
     address?: string,
     deleted_at?: string,
-    pricing_period?: "Hourly" | "Weekly" | "Monthly" | "Quaterly" | "Yearly"
+    pricing_period?: string, // "Hourly" | "Weekly" | "Monthly" | "Quaterly" | "Yearly"
     ad_ratings?: AdRating[],
     sub_category?: SubCategory,
     ad_promotions?: AdPromotion,
     ad_images?: AdImage[],
-    seller?: Profile,
+    profiles?: Profile,
+    rating?: number
+}
+
+export interface AdData extends Ad {
+    category?: Category,
+    imageFiles?: File[]
 }
 
 export type AdRating = {

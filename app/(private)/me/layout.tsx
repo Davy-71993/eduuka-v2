@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/resizable"
 import Container from '@/components/Container'
 import Image from 'next/image'
-import { Barcode, Bell, CreditCard, Home, Send, Settings, Store, Trash, User, Weight } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
@@ -86,12 +84,12 @@ export default function DashboardLayout({ children }: Props) {
             
     }, [])
   return (
-    <Container clasName=''>
-        <ResizablePanelGroup direction="horizontal" className='min-h-[86vh] border border-primary'>
+    <Container clasName='pt-2'>
+        <ResizablePanelGroup direction="horizontal" className='min-h-[80vh] rounded-sm'>
             <ResizablePanel onResize={ handleResize } minSize={5} defaultSize={25} maxSize={30}
-                className='bg-primary nav-panel text-primary-foreground hidden md:block min-w-20 min-h-[90vh]'>
+                className='bg-secondary nav-panel text-secondary-foreground hidden md:block min-w-20 min-h-[90vh] rounded-l-sm'>
                 <div className="w-full h-full">
-                    <div className="p-3 border-b-2 h-fit flex flex-col items-center">
+                    <div className="p-3 h-fit flex flex-col items-center">
                         <Image src={'/profile.jpg'} alt='Profile Image' height={100} width={ 100 } 
                             className='w-full h-auto rounded-full max-w-16 mx-auto'/>
                         
@@ -116,13 +114,13 @@ export default function DashboardLayout({ children }: Props) {
                     </div>
                 </div>
             </ResizablePanel>
-            <ResizableHandle className='border-r-2 border-primary hidden md:block' />
+            <ResizableHandle className='border-r-2 border-secondary hidden md:block' />
             <ResizablePanel className='page-panel w-full' defaultSize={75} minSize={ 70 }>
-                <div className="px-5 pt-3 pb-1 flex justify-between items-center border-b border-primary">
-                    <h1 className='uppercase font-bold text-2xl text-primary'>{ title }</h1>
+                <div className="px-2 sm:px-5  h-16 flex justify-end sm:justify-between items-center bg-secondary">
+                    <h1 className='hidden sm:block uppercase font-bold text-2xl text-primary'>{ title }</h1>
                     {
                         dateTime &&
-                        <Button variant={'outline'} className='hidden text-primary sm:block'>{ dateTime?.date + " " + dateTime?.time }</Button>
+                        <Button variant={'outline'} className='text-primary'>{ dateTime?.date + " " + dateTime?.time }</Button>
                     }
                 </div>
                 { children }

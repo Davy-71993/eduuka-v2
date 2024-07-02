@@ -5,26 +5,24 @@
  */
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import Container from '@/components/Container'
 import Image from 'next/image'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { chats } from '@/lib/dami-api'
 import { Chat } from '@/lib/types'
 import { useSearchParams } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
-import { MailQuestion, Mic, Send, SendHorizonal } from 'lucide-react'
+import { MailQuestion, SendHorizonal } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-  
+ 
 export default function ChatPage() {
+  const chats: Chat[] = []
     const setPanelSize = (size: number, changeSize: number) => {
         const panel = document.querySelector('.chat-heads')
         const hiddables = document.querySelectorAll('.chat-head-text')

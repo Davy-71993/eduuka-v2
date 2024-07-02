@@ -1,10 +1,9 @@
 "use client"
 
 
-import { Home, Icon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { ComponentType, JSXElementConstructor, ReactNode } from 'react'
+import React, { ComponentType } from 'react'
 
 type Props = {
     href: string,

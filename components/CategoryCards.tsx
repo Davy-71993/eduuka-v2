@@ -9,7 +9,7 @@ export function CategoryCard({ category }: { category: Category }) {
       <div className="p-2 sm:p-5 text-center sm:text-xl">
         <h2>{ category.name }</h2>
         {/* This should indicate the number of ads in thos category */}
-        <p className="font-thin text-sm sm:text-base">{ category.sub_categories.length + ' '} Subcategories</p>
+        <p className="font-thin text-sm sm:text-base">{ category.sub_categories?.length + ' '} Subcategories</p>
       </div>
     </div>
   )

@@ -3,7 +3,6 @@
  * Main dashboard
  */
 
-import MyBarChart from '@/components/damies/BarChart'
 import React from 'react'
 
 export default function page() {

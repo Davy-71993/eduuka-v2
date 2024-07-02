@@ -1,11 +1,13 @@
 
 import React from 'react'
 import AdsTable from './Table'
-import { ads } from '@/lib/dami-api'
+import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
+import { fetchAds } from '@/lib/db/api'
 
-type Props = {}
-
-export default function AdPage({}: Props) {
+export default async function AdPage() {
+  const supabase = createClient(cookies())
+  const ads = await fetchAds(supabase)
   return (
     <div className='p-5'>
         <AdsTable ads={ ads.slice(0, 5) } />

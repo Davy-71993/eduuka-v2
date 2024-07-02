@@ -15,15 +15,17 @@ import { DesktopCategories, PriceRange, Rating } from "@/components/Fiters"
 import SearchBar from "@/components/SearchBar"
 import StoreCard from "@/components/StoreCard"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import {  stores } from "@/lib/dami-api"
-import { fetchCategories } from "@/lib/db/api"
-import { fetchAllWithoutFilters } from "@/lib/db/utils"
-import { Ad, Category } from "@/lib/types"
+import { fetchAds, fetchCategories, fetchStores } from "@/lib/db/api"
+import { createClient } from "@/lib/supabase/server"
+import { cookies } from "next/headers"
 import Link from "next/link"
 
 export default async function Home() {
-  const categories = await fetchCategories()
-  const ads: Ad[] = [] // Fetch ads from db
+  const supabase = createClient(cookies())
+  const ads = await fetchAds(supabase)
+  const categories = await fetchCategories(supabase)
+  const stores = await fetchStores(supabase)
+
   return (
     <Container clasName="pt-5">
       <SearchBar includeLocation />
@@ -53,7 +55,7 @@ export default async function Home() {
           <h1 className="text-2xl mt-8 mb-3">Trending Ads</h1>
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
             {
-              ads.slice(0,6).map((ad, index)=>(
+              ads.map((ad, index)=>(
                 <AdCard key={index} ad={ad} />
               ))
             }
