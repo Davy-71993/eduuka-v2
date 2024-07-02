@@ -1,4 +1,6 @@
-import React from 'react'
+"use client"
+
+import React, { useEffect, useState } from 'react'
 import { SelectContent, SelectItem, SelectTrigger, SelectValue, Select } from './ui/select'
 
 type Props = {
@@ -13,9 +15,11 @@ type Props = {
 }
 
 export default function DefaultSelect({ options, placeholder, className, disabled, onSelect }: Props) {
+    const [value, setValue] = useState('')
+    useEffect(()=>{ onSelect(value)}, [value, onSelect])
   return (
-    <Select disabled = { disabled }>
-        <SelectTrigger className={ `${className}` } onChange={ (e: any)=>{onSelect(e.target.value)} }>
+    <Select disabled = { disabled } value={ value } onValueChange={ (e)=>setValue(e) }>
+        <SelectTrigger className={ `${className}` }>
             <SelectValue placeholder={ placeholder } className='' />
         </SelectTrigger>
         <SelectContent className="w-full">

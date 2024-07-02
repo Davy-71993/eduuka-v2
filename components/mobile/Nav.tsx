@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { Menu, Plus, User } from 'lucide-react'
+import { Home, LogOut, Menu, Plus, User } from 'lucide-react'
 import { 
     NavigationMenu, 
     NavigationMenuContent, 
@@ -13,21 +13,34 @@ import {
 import Link from 'next/link'
 import { Button } from '../ui/button'
 import { MobileCategories, Location, PriceRange, Rating } from '../Fiters'
-import { categories } from '@/lib/dami-api'
 import { usePathname } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { MobileLinkItem } from '@/app/(private)/me/LinkItem'
 import { ScrollArea } from '../ui/scroll-area'
+import { createClient } from '@/lib/supabase/client'
+import { Category } from '@/lib/types'
 
 type Props = {
     authenticated: boolean,
-    userData?: any
+    userData?: any,
+    categories: Category[]
 }
 
-export default function Nav({ authenticated, userData }: Props) {
+export default function Nav({ authenticated, categories }: Props) {
 
     const pathname = usePathname()
+    const supabase =  createClient()
+
+    const logout = async() => {
+        const { error } = await supabase.auth.signOut()
+        
+        
+        if(!error){
+            location.reload()
+        }
+
+        console.log(error)
+    }
 
 
   return (
@@ -37,15 +50,31 @@ export default function Nav({ authenticated, userData }: Props) {
                 <NavigationMenuTrigger className='hover:bg-primary-foreground hover:text-primary border-2 border-primary-foreground rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <User/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col min-w-[18rem] self-center'>
+                <NavigationMenuContent className='flex flex-col min-w-[18rem] self-center p-5'>
                     {
                         authenticated ?
-
-                            <div className='w-full '>
-                                <Link href={'/me'}>
-                                    <h2 className='border-b p-2 text-center text-primary'>My Account</h2>
-                                </Link>
-                            </div>
+                            <>
+                                <NavigationMenuLink asChild className='w-full'>
+                                    <Link href={'/me'}>
+                                        <h2 className='border-b p-2 text-center text-primary mb-3'>My Account</h2>
+                                    </Link>
+                                </NavigationMenuLink>
+                                <NavigationMenuLink asChild className='w-full'>
+                                    <Link href={'/me'}>
+                                        <h2 className='p-2 text-primary hover:bg-primary/10 rounded-sm text-lg flex space-x-5 w-full px-5 transition-colors items-center'><Home /><span>Dashboard</span></h2>
+                                    </Link>
+                                </NavigationMenuLink>
+                                <NavigationMenuLink asChild className='w-full'>
+                                    <Link href={'/me/ads/create'}>
+                                        <h2 className='p-2 text-primary hover:bg-primary/10 rounded-sm text-lg flex space-x-5 w-full px-5 transition-colors items-center'><Plus /><span>Post Ad</span></h2>
+                                    </Link>
+                                </NavigationMenuLink>
+                                <NavigationMenuLink asChild className='w-full'>
+                                        <Button onClick={ logout } className='p-2 text-primary-foreground bg-red-500 hover:bg-red-600 rounded-sm text-lg flex space-x-5 justify-center w-full px-5 mt-5 transition-colors items-center'>
+                                            <LogOut /><span>Logout</span>
+                                        </Button>
+                                </NavigationMenuLink>
+                            </>
 
                         :
                             <>

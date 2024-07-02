@@ -2,17 +2,19 @@ import AdCard from '@/components/AdCard'
 import Container from '@/components/Container'
 import { DesktopCategories, Location, PriceRange, Rating } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
-import { fetchCategories } from '@/lib/db/api'
-import { Ad } from '@/lib/types'
+import { fetchAds, fetchCategories } from '@/lib/db/api'
+import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import React from 'react'
 
 type Props = {}
 
 export default async function page({}: Props) {
 
-  const categories = await fetchCategories()
-  
-  const ads: Ad[] = [] // fetch ads from db
+  const supabase = createClient(cookies())
+  const categories = await fetchCategories(supabase)
+  const ads = await fetchAds(supabase)
+
   return (
     <Container clasName='pt-5'>
       <SearchBar />

@@ -24,7 +24,7 @@ export default function RootLayout({
       <body 
         className={
           cn(
-            "bg-background font-sans antialiased",
+            "bg-background font-sans antialiased scroll-smooth",
             inter.variable
           )
         }
@@ -37,8 +37,8 @@ export default function RootLayout({
           > */}
             
             <NavBar />
-            <div className="mt-16 sm:mt-[5.25rem] min-h-[70vh]">
-            {children}
+            <div className="pt-[4.5rem] sm:pt-24 pb-10 min-h-[70vh]">
+              {children}
             </div>
             <Footer />
           {/* </ThemeProvider> */}

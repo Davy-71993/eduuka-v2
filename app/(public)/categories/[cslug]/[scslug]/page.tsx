@@ -6,7 +6,8 @@ import { PriceRange, Rating, Location } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
-import { Ad, SubCategory } from '@/lib/types'
+import { SubCategory } from '@/lib/types'
+import { fetchAds } from '@/lib/db/api'
 
 type Props = {
   params: any
@@ -19,7 +20,7 @@ export default async function page({ params }: Props) {
   const subCategory = data as unknown as SubCategory
   const category = subCategory.categories
 
-  const ads: Ad[] = [] //Fetch ads from db
+  const ads = await fetchAds(supabase)
 
   return (
     <Container clasName='pt-5'>

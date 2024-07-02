@@ -2,7 +2,6 @@
 
 import React from 'react'
 import TrashTable from './Table'
-import { trashItems } from '@/lib/dami-api'
 
 type Props = {}
 
@@ -22,7 +21,7 @@ export default function TrashPage({}: Props) {
    */
   return (
     <div className='p-5'>
-        <TrashTable trashItems={ trashItems } />
+        <TrashTable trashItems={ [] } />
     </div>
   )
 }

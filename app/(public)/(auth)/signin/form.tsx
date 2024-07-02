@@ -4,9 +4,9 @@ import Submit from "@/components/SubmitButton";
 import Google from "@/components/icons/Google";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { Check } from "lucide-react";
 import Link from "next/link";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 export default function Form() {
   const supabase = createClient()
@@ -14,9 +14,7 @@ export default function Form() {
   // console.log(await supabase.auth.getUser())
   const [transition, startTransition] = useTransition()
   const [errorMessage, setErrorMessage] = useState<string>()
-  const { refresh } = useRouter()
-  
-  const nexturl = useSearchParams().get('next')
+  const [success, setSuccess] = useState(false)
 
   const handleSignin = async(formdata: FormData) => {
     
@@ -30,11 +28,9 @@ export default function Form() {
         return
       }
 
-      if(nexturl){
-        return redirect(nexturl)
-      }
+      setSuccess(true)
 
-      return redirect('/')
+      location.reload()
     })
   }
 
@@ -47,6 +43,7 @@ export default function Form() {
           <p className="text-red-400">{ errorMessage }</p>
         </div>
       )}
+
       <form
         className="flex-1 flex flex-col w-full justify-center text-foreground"
         action={ handleSignin }
@@ -74,7 +71,11 @@ export default function Form() {
           placeholder="••••••••"
           required
         />
-        <Button className="transition-colors py-5 text-secondary mb-2 text-xl">
+        <Button className={`transition-colors ${ success && 'bg-green-500'} py-5 text-primary-foreground flex space-x-5 mb-2 text-xl`}>
+          {
+            success && 
+            <Check />
+          }
           <Submit loadingText="Signing In" laodingState={ transition } btnText="Sign In" />
         </Button>
       </form>

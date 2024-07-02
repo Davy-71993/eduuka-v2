@@ -10,7 +10,6 @@ import LocationSelector from "@/components/LocationSelector"
 import { ScrollArea } from "./ui/scroll-area"
 import Link from "next/link"
 import { NavigationMenuLink } from "@radix-ui/react-navigation-menu"
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "./ui/navigation-menu"
 
 
 export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}) =>(

@@ -3,7 +3,9 @@ import Container from '@/components/Container'
 import FadingLine from '@/components/FadingLine'
 import { DesktopCategories, PriceRange, Rating } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
-import { ads, categories, stores } from '@/lib/dami-api'
+import { fetchAds, fetchCategories, fetchStoreByID } from '@/lib/db/api'
+import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -12,10 +14,14 @@ type Props = {
     params: any
 }
 
-export default function StorePage({ params }: Props) {
+export default async function StorePage({ params }: Props) {
     const storeID = params['sid']
-    console.log(storeID)
-    const store = stores.find((s) => s.id === storeID)
+    const supabase = createClient(cookies())
+    const store = await fetchStoreByID(supabase, storeID)
+    const categories = await fetchCategories(supabase)
+    const ads = await fetchAds(supabase)
+
+    if(!store) return null;
   return (
     <Container clasName='pt-5'>
         <SearchBar includeLocation />
@@ -35,7 +41,7 @@ export default function StorePage({ params }: Props) {
                 <h1 className="text-2xl">Ads from { store?.name }</h1>
                 <div className="grid gap-4 mb-5 pb-5 grid-cols-2 lg:grid-cols-3 w-full">
                     {
-                        ads.slice(0,6).map((ad, index)=>(
+                        ads.map((ad, index)=>(
                         <AdCard key={index} ad={ad} />
                         ))
                     }
@@ -45,7 +51,7 @@ export default function StorePage({ params }: Props) {
                     <FadingLine />
                     <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
                         {
-                            ads.slice(0,6).map((ad, index)=>(
+                            ads.map((ad, index)=>(
                             <AdCard key={index} ad={ad} />
                             ))
                         }

@@ -1,14 +1,18 @@
-import { CategoryCard } from '@/components/CategoryCards'
+
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import StoreCard from '@/components/StoreCard'
-import { categories, stores } from '@/lib/dami-api'
+import { fetchStores } from '@/lib/db/api'
+import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {}
 
-export default function StoresPage({}: Props) {
+export default async function StoresPage({}: Props) {
+  const supabase = createClient(cookies())
+  const stores = await fetchStores(supabase)
   return (
     <Container clasName='pt-5'>
       <SearchBar includeLocation/>

@@ -8,69 +8,49 @@ const Footer = () => {
   return (
     <Container clasName='w-full bg-primary text-primary-foreground'>
         <>
-            <div className="sm:grid sm:grid-cols-2 py-5 md:grid-cols-3 lg:grid-cols-5 gap-5">
-                <div className="col">
-                    <h1 className="text-xl font-bold mt-5"><Link href='/buy'>Buy</Link></h1>
+            <div className="flex flex-wrap space-x-5 w-full gap-5 p-5">
+                <div className="w-fit">
+                    <h1 className="text-xl font-bold"><Link href='/about'>About eDuuka</Link></h1>
+                    <h1 className='text-xl font-bold'><Link href='/about/policies'>Policies</Link></h1>
+                </div>
+                <div className="w-fit">
+                    <h1 className="text-xl font-bold"><Link href='/find'>Buy</Link></h1>
                     <ul className='list-none text-sm my-4'>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/help/#how-to-buy'>How to buy</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Live virtual market</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Shops & Stores</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/register?as=buyer'>Registration</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/support/#how-to-buy'>How to buy</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/stores'>Shops & Stores</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/signup'>Registration</Link></li>
                     </ul>
                 </div>
-                <div className="col">
-                    <h1 className="text-xl font-bold mt-5"><Link href='/my-shop/sell'>Sell</Link></h1>
+                <div className="w-fit">
+                    <h1 className="text-xl font-bold"><Link href='/me/ads/create'>Sell</Link></h1>
                     <ul className='list-none text-sm my-4'>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/help/#how-to-buy'>Start Selling</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Learn to Sell</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Create Store</Link></li>
-                    </ul>
-                    <div className="col">
-                        <h1 className="text-xl font-bold mt-5">Tools & Apps</h1>
-                        <ul className='list-none text-sm my-4'>
-                            <li className='my-2 hover:font-bold transition-all'><Link href='/help/#how-to-buy'>Develpers</Link></li>
-                            <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Site map</Link></li>
-                            <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Mobile Apps</Link></li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="col">
-                    <h1 className="text-xl font-bold mt-5">Stay Connected</h1>
-                    <ul className='list-none text-sm my-4'>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/blog/#how-to-buy'>Blog</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Facebook</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Twitter</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Instagram</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>LinkedIn</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>YouTube</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/me/ads/create'>Start Selling</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/support/#how-to-sell'>Learn to Sell</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/me/stores/create'>Create Store</Link></li>
                     </ul>
                 </div>
-                <div className="col">
-                    <h1 className="text-xl font-bold mt-5"><Link href='/about'>About DolineShop</Link></h1>
+                <div className="w-fit">
+                    <Link href="/support">
+                        <h1 className="text-xl font-bold">Help & Support</h1>
+                    </Link>
                     <ul className='list-none text-sm my-4'>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Company Info</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>News</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Investors</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Careers</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Government Relations</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Advertise with us</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Policies</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Verified Rights Owner program</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/support/info-center'>Customer info center</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/support/how-to/#advertise'>Advertise with us</Link></li>
+                        <li className='my-2 hover:font-bold transition-all'><Link href='/contact-us'>Contact us</Link></li>
                     </ul>
                 </div>
-                <div className="col">
-                    <h1 className="text-xl font-bold mt-5">Help & Contact</h1>
-                    <ul className='list-none text-sm my-4'>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/blog/#how-to-buy'>Customer info center</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Contact us</Link></li>
-                    </ul>
-                    <div className="col">
-                    <h1 className="text-xl font-bold mt-5">Comunity</h1>
-                    <ul className='list-none text-sm my-4'>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/help/#how-to-buy'>Announcements</Link></li>
-                        <li className='my-2 hover:font-bold transition-all'><Link href='/#'>Discussion boards</Link></li>
-                    </ul>
-                    </div>
+            </div>
+            {/* <FadingLine/> */}
+            <div className="w-full overflow-hidden">
+                <h1 className="text-xl font-bold mt-5">Stay Connected</h1>
+                <Link href='/blog'>Blog</Link>
+                <Link href='/blog'>News</Link>
+                <div className='flex space-x-2 sm:space-x-5 w-full'>
+                    <Link href='#'>Facebook</Link>
+                    <Link href='#'>Twitter</Link>
+                    <Link href='#'>Instagram</Link>
+                    <Link href='#'>LinkedIn</Link>
+                    <Link href='#'>YouTube</Link>
                 </div>
             </div>
             <FadingLine/>

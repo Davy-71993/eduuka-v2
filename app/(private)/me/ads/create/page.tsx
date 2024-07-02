@@ -1,17 +1,18 @@
 
 import React from 'react'
-import Form from './Form'
 import { getCategories } from '@/lib/actions/db_actions'
+import AdForm from './AdForm'
 
-type Props = {}
+export default async function AdCreatePage() {
 
-export default async function AdCreatePage({}: Props) {
-  const categories = await getCategories()
-  // console.log(categories)
+  const categories = await getCategories('name, id, sub_categories(id, name, extra_fields)')
+  
   return (
-      <div className='p-5 flex flex-col space-y-5'>
-        <h1 className="bg-secondary text-center p-5 rounded-sm text-3xl text-primary font-bold">Create your Advert.</h1>
-        <Form categories={ categories } />
+      <div className='pt-2 md:pl-5 flex flex-col space-y-3'>
+        <h1 className="bg-secondary text-center py-1 sm:py-3 rounded-sm text-lg sm:text-3xl text-primary font-bold">Create your Advert.</h1>
+        <div className="rounded-sm w-full h-full">
+          <AdForm categories={ categories } />
+        </div>
       </div>
   )
 }
