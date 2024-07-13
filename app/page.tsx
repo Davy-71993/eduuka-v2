@@ -9,23 +9,19 @@
  * -> List of trending ads.
  */
 
-import AdCard from "@/components/AdCard"
+import AdsList from "@/components/AdsList"
 import Container from "@/components/Container"
-import { DesktopCategories, PriceRange, Rating } from "@/components/Fiters"
+import { HomeFiltersContainer } from "@/components/FilterContainers"
+import { DesktopCategories } from "@/components/Fiters"
 import SearchBar from "@/components/SearchBar"
 import StoreCard from "@/components/StoreCard"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { fetchAds, fetchCategories, fetchStores } from "@/lib/db/api"
-import { createClient } from "@/lib/supabase/server"
-import { cookies } from "next/headers"
+import { fetchStores, getCategories } from "@/lib/actions/db_actions"
 import Link from "next/link"
 
 export default async function Home() {
-  const supabase = createClient(cookies())
-  const ads = await fetchAds(supabase)
-  const categories = await fetchCategories(supabase)
-  const stores = await fetchStores(supabase)
-
+  const categories = await getCategories()
+  const stores = await fetchStores()
   return (
     <Container clasName="pt-5">
       <SearchBar includeLocation />
@@ -33,8 +29,7 @@ export default async function Home() {
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col space-y-5 mb-10">
           <h1 className="text-2xl">Extra filters.</h1>
           <DesktopCategories categories={ categories } />
-          <PriceRange />
-          <Rating />
+          <HomeFiltersContainer />
         </div>
         <div className="w-full md:w-[80%] flex flex-col space-y-5 md:px-5 overflow-hidden">
           <Link href="/stores"><h1 className="text-2xl hover:text-blue-500 transition-colors">Popular Stores { ">>" }</h1></Link>
@@ -52,15 +47,8 @@ export default async function Home() {
           </ScrollArea>
 
           {/* Trending Ads */}
-          <h1 className="text-2xl mt-8 mb-3">Trending Ads</h1>
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
-            {
-              ads.map((ad, index)=>(
-                <AdCard key={index} ad={ad} />
-              ))
-            }
-          </div>
-
+          
+          <AdsList />
           {/* Link to the find page */}
           <div className="w-full flex justify-end py-5">
             <Link href={'/find'} className="p-2 sm:p-3 bg-primary hover:bg-primary/80 transition-opacity rounded-sm text-primary-foreground font-bold text-sm sm:text-xl">Continue To All Ads {" >>"}</Link>

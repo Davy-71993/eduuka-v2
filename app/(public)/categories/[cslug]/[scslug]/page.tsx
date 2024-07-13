@@ -1,13 +1,11 @@
-import AdCard from '@/components/AdCard'
+
 import Container from '@/components/Container'
 import Link from 'next/link'
 import React from 'react'
 import { PriceRange, Rating, Location } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import { SubCategory } from '@/lib/types'
-import { fetchAds } from '@/lib/db/api'
+import AdsList from '@/components/AdsList'
+import { getSubCategory } from '@/lib/actions/db_actions'
 
 type Props = {
   params: any
@@ -15,13 +13,8 @@ type Props = {
 
 export default async function page({ params }: Props) {
   const scslug = params.scslug
-  const supabase = createClient(cookies())
-  const { data } = await supabase.from('sub_categories').select('name, categories(slug, name)').eq('slug', scslug).single()
-  const subCategory = data as unknown as SubCategory
+  const subCategory = await getSubCategory(scslug)
   const category = subCategory.categories
-
-  const ads = await fetchAds(supabase)
-
   return (
     <Container clasName='pt-5'>
       <SearchBar />
@@ -32,20 +25,14 @@ export default async function page({ params }: Props) {
           <Rating />
         </div>
         <div className="w-full md:w-[80%] md:px-5 overflow-hidden">
-
-            {/* Trending Ads */}
             <h1 className="text-lg sm:text-xl lg:text-2xl mb-5">
               <Link className='text-blue-400 hover:text-blue-600 transition-colors' href={`/categories`}>Categories</Link>
               { " > " }
               <Link className='text-blue-400 hover:text-blue-600 transition-colors' href={`/categories/${ category?.slug }`}>{  category?.name }</Link> 
               { " > " + subCategory?.name }</h1>
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
-              {
-                ads.map((ad, index)=>(
-                  <AdCard key={index} ad={ad} />
-                ))
-              }
-            </div>
+            
+            {/* Render ads for a specific sub category. */}
+            <AdsList />
 
             {/* Link to the find page */}
             <div className="w-full flex justify-end py-5">

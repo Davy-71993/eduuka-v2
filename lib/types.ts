@@ -16,7 +16,7 @@
  */
 
 export type Profile = {
-    id: string,
+    id?: string,
     first_name?: string,
     last_name?: string,
     image?: string,
@@ -26,23 +26,25 @@ export type Profile = {
     ads?:Ad[],
     clients?: Profile[]
     sex?: string,
-    dob?: string
+    dob?: string,
+    email?: string,
+    phone?: string
 }
 
 
 export type Category = {
     id?: string,
-    name: string,
-    image: string,
+    name?: string,
+    image?: string,
     sub_categories?: SubCategory[],
     ads?: Ad[],
-    slug: string
+    slug?: string
 }
 
 export type SubCategory = {
     id?: string,
-    name: string,
-    image: string,
+    name?: string,
+    image?: string,
     ads?: Ad[],
     extra_fields?: string,
     slug?: string,
@@ -65,6 +67,7 @@ export type Ad = {
     description?: string,
     status?: "Draft" | "Active" | "Sold" | "Deleted" | "Promoted",
     sub_category_id?: string,
+    category_id?: number,
     store_id?: string,
     views?: number
     trashed_at?: string,
@@ -82,6 +85,11 @@ export type Ad = {
     ad_images?: AdImage[],
     profiles?: Profile,
     rating?: number
+}
+
+export type AdLocation = {
+    ad_id?: string,
+    geo?: string
 }
 
 export interface AdData extends Ad {
@@ -120,12 +128,12 @@ export type Transuction ={
 }
 
 export type Store = {
-    id: string,
-    name: string,
+    id?: string,
+    name?: string,
     description?: string,
     ads?: Ad[]
     keeper_id?: string,
-    keeper: Profile,
+    keeper?: Profile,
     trashed_at?: string,
     deleted_at?: string,
     location?: Location,

@@ -1,15 +1,17 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
 import { Category, SubCategory } from "@/lib/types"
 import { AccordionTrigger } from "@radix-ui/react-accordion"
-import { ChevronDown, Star } from "lucide-react"
+import { Check, ChevronDown, Star } from "lucide-react"
 import LocationSelector from "@/components/LocationSelector"
 import { ScrollArea } from "./ui/scroll-area"
 import Link from "next/link"
 import { NavigationMenuLink } from "@radix-ui/react-navigation-menu"
+import { Button } from "./ui/button"
+import axios from "axios"
 
 
 export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}) =>(
@@ -27,71 +29,116 @@ export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}
     </Accordion>
 )
 
-export const PriceRange = () => (
-    <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
-        <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
-            <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Price Range</span><ChevronDown/></AccordionTrigger>
-            <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center'>
-               <Input placeholder="Min" className="px-2 h-fit py-2"/><p>-to-</p> <Input placeholder="Max" className="px-2 h-fit py-2"/>
-            </AccordionContent>
-        </AccordionItem>
-    </Accordion>
-)
+export const PriceRange = ({ setter, error }: { setter?: (range?: {min?: string, max?: string}) => void, error?: string }) => {
+    const [ range, setRange ] = useState<{min?: string, max?: string}>()
+    useEffect(()=>{ setter && setter(range)}, [range])
+    return (
+        <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
+            <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
+                <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Price Range</span><ChevronDown/></AccordionTrigger>
+                <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center'>
+                    {
+                        error &&
+                        <p className="text-red-500">{ error }</p>
+                    }
+                    <Input 
+                        placeholder="Min" 
+                        type="number"
+                        value={ range?.min ?? '' } 
+                        onChange={ (e) => { setRange({...range, min: e.target.value})} }
+                        className="px-2 h-fit py-2"/>
+                    <p>-to-</p> 
+                    <Input 
+                        placeholder="Max" 
+                        type="number"
+                        className="px-2 h-fit py-2"
+                        onChange={ (e) => { setRange({...range, max: e.target.value})} }
+                        value={ range?.max ?? '' } />
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    )
+}
 
-export const Rating = () => (
-    <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
-        <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
-            <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Ad Ratings</span><ChevronDown/></AccordionTrigger>
-            <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center'>
-                <div className="flex w-full rounded-sm text-yellow-500 transition-colors duration-100 p-3 hover:bg-background justify-start items-center">
-                    <div className="w-fit flex">
-                        <Star /><Star /><Star /><Star /><Star />
-                    </div>
-                    <div className="w-full text-right">
-                        <p className="self-end">5</p>
-                    </div>
-                </div>
-                <div className="flex w-full rounded-sm text-yellow-500 transition-colors duration-100 p-3 hover:bg-background justify-start items-center">
-                    <div className="w-fit flex">
-                        <Star /><Star /><Star /><Star />
-                    </div>
-                    <div className="w-full text-right">
-                        <p className="self-end">4 and above</p>
-                    </div>
-                </div>
-                <div className="flex w-full rounded-sm text-yellow-500 transition-colors duration-100 p-3 hover:bg-background justify-start items-center">
-                    <div className="w-fit flex">
-                        <Star /><Star /><Star />
-                    </div>
-                    <div className="w-full text-right">
-                        <p className="self-end">3 and above</p>
-                    </div>
-                </div>
-                <div className="flex w-full rounded-sm text-yellow-500 transition-colors duration-100 p-3 hover:bg-background justify-start items-center">
-                    <div className="w-fit flex">
-                        <Star/><Star />
-                    </div>
-                    <div className="w-full text-right">
-                        <p className="self-end"> 2 and above</p>
-                    </div>
-                </div>
-            </AccordionContent>
-        </AccordionItem>
-    </Accordion>
-)
+export const Rating = ({ setter }: { setter?: (val?: number)=> void }) => {
+    const [minRating, setMinRating] = useState<number>()
+    useEffect(()=>{ setter && setter(minRating)}, [minRating])
+    return (
+        <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
+            <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
+                <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Ad Ratings</span><ChevronDown/></AccordionTrigger>
+                <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center'>
+                    <Button onClick={()=>{setMinRating(5)}} 
+                    className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
+                        <div className="w-fit flex">
+                            <Star /><Star /><Star /><Star /><Star />
+                        </div>
+                        <div className="w-fit">
+                            <p className="self-end">5</p>
+                        </div>
+                        {
+                            minRating === 5 &&
+                            <Check />
+                        }
+                    </Button>
+                    <Button onClick={()=>{setMinRating(4)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
+                        <div className="w-fit flex">
+                            <Star /><Star /><Star /><Star />
+                        </div>
+                        <div className="w-fit">
+                            <p className="self-end">4 and above</p>
+                        </div>
+                        {
+                            minRating === 4 &&
+                            <Check />
+                        }
+                    </Button>
+                    <Button onClick={()=>{setMinRating(3)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
+                        <div className="w-fit flex">
+                            <Star /><Star /><Star />
+                        </div>
+                        <div className="w-fit">
+                            <p className="self-end">3 and above</p>
+                        </div>
+                        {
+                            minRating === 3 &&
+                            <Check />
+                        }
+                    </Button>
+                    <Button onClick={()=>{setMinRating(2)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
+                        <div className="w-fit flex">
+                            <Star/><Star />
+                        </div>
+                        <div className="w-fit">
+                            <p className="self-end"> 2 and above</p>
+                        </div>
+                        {
+                            minRating === 2 &&
+                            <Check />
+                        }
+                    </Button>
+                    <Button onClick={()=>{setMinRating(undefined)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">Clear Rating</Button>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    )
+}
 
-export const Location = () =>(
-    <div className="w-full py-2 border-none bg-secondary rounded-sm">
-        <div className='w-full border-none border-t px-2'>
-            <div className="w-full text-xl">
-                <div className="flex justify-between items-center p-2">
-                    <span>Location</span>
+export const Location = () =>{
+    return (
+        <div className="w-full py-2 border-none bg-secondary rounded-sm">
+            <div className='w-full border-none border-t px-2'>
+                <div className="w-full text-xl">
+                    <div className="flex justify-between items-center p-2">
+                        <span>Location</span>
+                    </div>
+                    <LocationSelector />
                 </div>
-                <LocationSelector />
             </div>
         </div>
-    </div>
-)
+
+    )
+}
 
 export const MobileCategories = ({categories}:{ categories: Category[]}) => (
     <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary h-fit max-h-full rounded-sm">

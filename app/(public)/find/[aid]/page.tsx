@@ -3,7 +3,7 @@ import AdCard from '@/components/AdCard'
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import { Button } from '@/components/ui/button'
-import { fetchAdByID, fetchAds } from '@/lib/db/api'
+import { getAdByID, getSimilarAds } from '@/lib/actions/db_actions'
 import { createClient } from '@/lib/supabase/server'
 import { Check, Star } from 'lucide-react'
 import { cookies } from 'next/headers'
@@ -18,23 +18,19 @@ type Props = {
 
 export default async function page({ params, searchParams }: Props) {
   const aid = params.aid
-  const supabase = createClient(cookies())
-  const ad = await fetchAdByID(supabase, aid)
-  const ads = await fetchAds(supabase)
 
-  // console.log(ad)
+  const ad = await getAdByID(aid)
+  const similarAds = await getSimilarAds(ad)
 
   const numberOrZer0 = (str: string) => {
     const index =  Number.isNaN(parseInt(str)) ? 1 : parseInt(str)
     return index > ad?.ad_images?.length! ? 1 : index
   }
 
-  console.log(numberOrZer0(searchParams['img']))
-
   if(!ad){
     return null
   }
-  const details = JSON.parse(ad?.ad_details || '');
+  const details = JSON.parse(ad?.ad_details || '[]');
 
   const handleDetails = () => {
     // Alternatively we can convert the details in 2D array ie [["", ""], ["", ""], ...]
@@ -161,7 +157,7 @@ export default async function page({ params, searchParams }: Props) {
         {/* filtered Ads */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full">
           {
-            ads.slice(0,6).map((ad, index)=>(
+            similarAds.slice(0,6).map((ad, index)=>(
               <AdCard key={index} ad={ad} />
             ))
           }

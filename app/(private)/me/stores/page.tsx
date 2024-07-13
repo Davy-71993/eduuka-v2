@@ -1,15 +1,12 @@
 
 import React from 'react'
 import StoresTable from './Table'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import { fetchStores } from '@/lib/db/api'
+import { fetchStores } from '@/lib/actions/db_actions'
 
 type Props = {}
 
 export default async function AdPage({}: Props) {
-  const supabase = createClient(cookies())
-  const stores = await fetchStores(supabase)
+  const stores = await fetchStores()
   return (
     <div className='p-5'>
         <StoresTable stores={ stores } />

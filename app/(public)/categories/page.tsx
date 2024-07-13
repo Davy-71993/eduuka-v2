@@ -1,17 +1,14 @@
 import { CategoryCard } from '@/components/CategoryCards'
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
-import { fetchCategories } from '@/lib/db/api'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { getCategories } from '@/lib/actions/db_actions'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {}
 
 export default async function page({}: Props) {
-  const supabase = createClient(cookies())
-  const categories = await fetchCategories(supabase, 'slug, name, image, sub_categories(id)')
+  const categories = await getCategories()
   return (
     <Container clasName='pt-5'>
       <SearchBar includeLocation/>

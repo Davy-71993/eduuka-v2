@@ -2,17 +2,14 @@
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import StoreCard from '@/components/StoreCard'
-import { fetchStores } from '@/lib/db/api'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { fetchStores } from '@/lib/actions/db_actions'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {}
 
 export default async function StoresPage({}: Props) {
-  const supabase = createClient(cookies())
-  const stores = await fetchStores(supabase)
+  const stores = await fetchStores()
   return (
     <Container clasName='pt-5'>
       <SearchBar includeLocation/>

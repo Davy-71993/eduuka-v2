@@ -94,7 +94,7 @@ export default function StepFive({}: Props) {
       }
 
       const metaDataRes = await supabase.from('ad_images').insert({
-        url: `${CDN_URL}ads/${imageRes.data.path}`,
+        url: `${CDN_URL}/ads/${imageRes.data.path}`,
         ad_id: id
       })
 
