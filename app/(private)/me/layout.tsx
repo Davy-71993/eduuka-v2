@@ -8,12 +8,13 @@ import {
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import Container from '@/components/Container'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
 import LinkItem from './LinkItem'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { getProfile } from '@/lib/actions/db_actions'
+import { Profile } from '@/lib/types'
   
 
 type Props = {
@@ -68,7 +69,8 @@ export default function DashboardLayout({ children }: Props) {
             })
         }, 1000)
     }, [dateTime])
-
+    
+    const [profile, setProfile] = useState<Profile>()
     /**
      * Try to figure out how we can implement 
      * the resize behaviour on resize and scroll
@@ -82,36 +84,33 @@ export default function DashboardLayout({ children }: Props) {
         //     // setPanelSize(width, 215)
         // } 
             
+        const handleFetchProfile = async() => {
+            const profile = await getProfile()
+            setProfile(profile)
+        }
+        handleFetchProfile()
     }, [])
+
   return (
     <Container clasName='pt-2'>
         <ResizablePanelGroup direction="horizontal" className='min-h-[80vh] rounded-sm'>
             <ResizablePanel onResize={ handleResize } minSize={5} defaultSize={25} maxSize={30}
                 className='bg-secondary nav-panel text-secondary-foreground hidden md:block min-w-20 min-h-[90vh] rounded-l-sm'>
-                <div className="w-full h-full">
-                    <div className="p-3 h-fit flex flex-col items-center">
-                        <Image src={'/profile.jpg'} alt='Profile Image' height={100} width={ 100 } 
-                            className='w-full h-auto rounded-full max-w-16 mx-auto'/>
-                        
-                        <h1 className="w-fit text-xl font-bold hiddable line-clamp-1 overflow-hidden">Egessa David</h1>
-                        <p className="w-fit hiddable overflow-hidden">davy.kyute@gmail.com</p>
-                    </div>
-                    <div className="flex flex-col space-y-1 p-3">
-                        {
-                            DASHBOARD_LINKS.map((link, index)=>(
-                                <TooltipProvider key={index}>
-                                    <Tooltip delayDuration={2}>
-                                        <TooltipTrigger>
-                                            <LinkItem key={index} href={link.url} name={link.display_name} Icon={link.icon}/>
-                                        </TooltipTrigger>
-                                        <TooltipContent align='end' side='bottom'>
-                                            <p>{ link.title }</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            ))
-                        }
-                    </div>
+                <div className="flex flex-col space-y-1 mt-12 p-3">
+                    {
+                        DASHBOARD_LINKS.map((link, index)=>(
+                            <TooltipProvider key={index}>
+                                <Tooltip delayDuration={2}>
+                                    <TooltipTrigger>
+                                        <LinkItem key={index} href={link.url} name={link.display_name} Icon={link.icon}/>
+                                    </TooltipTrigger>
+                                    <TooltipContent align='end' side='bottom'>
+                                        <p>{ link.title }</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        ))
+                    }
                 </div>
             </ResizablePanel>
             <ResizableHandle className='border-r-2 border-secondary hidden md:block' />

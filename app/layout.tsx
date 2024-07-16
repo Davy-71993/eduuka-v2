@@ -13,12 +13,12 @@ export const metadata: Metadata = {
   description: "An online market place where you can buy, sell and advertise your products and services",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+
   return (
     <html lang="en">
       <body 

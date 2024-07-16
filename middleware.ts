@@ -8,5 +8,4 @@ export default async function middleware(request: NextRequest) {
  
 export const config = {
   matcher: ['/me/:path*', '/admin/:path*'],
-
 }

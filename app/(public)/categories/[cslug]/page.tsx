@@ -1,4 +1,4 @@
-import AdCard from '@/components/AdCard'
+
 import Container from '@/components/Container'
 import Link from 'next/link'
 import React from 'react'
@@ -6,9 +6,8 @@ import { PriceRange, Rating, Location } from '../../../../components/Fiters'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import {  SubCategoryCard } from '@/components/CategoryCards'
 import SearchBar from '@/components/SearchBar'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import { fetchAds, fetchCategoryByIDOrSlug } from '@/lib/db/api'
+import AdsList from '@/components/AdsList'
+import { getCategoryByIDOrSlug } from '@/lib/actions/db_actions'
 
 type Props = {
   params: any
@@ -17,18 +16,15 @@ type Props = {
 export default async function page({ params }: Props) {
 
   const slug = params.cslug
-  const supabase = createClient(cookies())
-
-  const ads = await fetchAds(supabase)
-  const category = await fetchCategoryByIDOrSlug(supabase, slug)
+  const category = await getCategoryByIDOrSlug(slug)
   
   return (
     <Container clasName='pt-5'>
       <SearchBar />
       <div className="flex mt-5 sm:mt-10 sm:space-x-5">
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col space-y-5 mb-10">
+          {/* Render the filter panel here. */}
           <Location />
-          {/* <SubCategories subCategories={ category?.sub_categories || [] } /> */}
           <PriceRange />
           <Rating />
         </div>
@@ -50,15 +46,10 @@ export default async function page({ params }: Props) {
             {/* Trending Ads */}
             <h1 className="text-lg sm:text-xl lg:text-2xl mt-5 md:mt-10 mb-2 sm:mb-5">
               <Link className='text-blue-400 hover:text-blue-600 transition-colors' href={`/categories`}>Categories</Link>
-              { " > " + category?.name }</h1>
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
-              {
-                ads.slice(0,6).map((ad, index)=>(
-                  <AdCard key={index} ad={ad} />
-                ))
-              }
-            </div>
-
+              { " > " + category?.name }
+            </h1>
+            {/* Render ads for specific category */}
+            <AdsList />
             {/* Link to the find page */}
             <div className="w-full flex justify-end py-5">
               <Link href={'/find'} className="p-2 sm:p-3 bg-primary hover:bg-primary/80 transition-opacity rounded-sm text-primary-foreground font-bold text-sm sm:text-xl">Continue To All Ads {" >>"}</Link>

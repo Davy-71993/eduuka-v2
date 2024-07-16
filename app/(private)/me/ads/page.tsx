@@ -1,13 +1,10 @@
 
 import React from 'react'
 import AdsTable from './Table'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import { fetchAds } from '@/lib/db/api'
+import { fetchAds } from '@/lib/actions/db_actions'
 
 export default async function AdPage() {
-  const supabase = createClient(cookies())
-  const ads = await fetchAds(supabase)
+  const ads = await fetchAds()
   return (
     <div className='p-5'>
         <AdsTable ads={ ads.slice(0, 5) } />

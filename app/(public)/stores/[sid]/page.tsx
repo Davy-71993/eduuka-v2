@@ -3,7 +3,7 @@ import Container from '@/components/Container'
 import FadingLine from '@/components/FadingLine'
 import { DesktopCategories, PriceRange, Rating } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
-import { fetchAds, fetchCategories, fetchStoreByID } from '@/lib/db/api'
+import { fetchAds, fetchStoreByID, getCategories } from '@/lib/actions/db_actions'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Image from 'next/image'
@@ -17,9 +17,9 @@ type Props = {
 export default async function StorePage({ params }: Props) {
     const storeID = params['sid']
     const supabase = createClient(cookies())
-    const store = await fetchStoreByID(supabase, storeID)
-    const categories = await fetchCategories(supabase)
-    const ads = await fetchAds(supabase)
+    const store = await fetchStoreByID(storeID)
+    const categories = await getCategories()
+    const ads = await fetchAds()
 
     if(!store) return null;
   return (

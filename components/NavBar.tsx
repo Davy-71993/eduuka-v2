@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { Plus } from 'lucide-react'
 import { Button } from './ui/button'
-import { fetchCategories } from '@/lib/db/api'
+import { getCategories } from '@/lib/actions/db_actions'
 
 type Props = {}
 
@@ -15,7 +15,7 @@ export default async function NavBar({}: Props) {
   const supabase = createClient(cookies())
   const { data, error } = await supabase.auth.getUser()
 
-  const categories = await fetchCategories(supabase)
+  const categories = await getCategories()
 
   return (
     <div className='w-full bg-primary text-primary-foreground py-3 sm:py-5 drop-shadow-lg z-10 fixed top-0 right-0'>

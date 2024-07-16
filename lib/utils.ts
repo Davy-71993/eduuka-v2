@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const toNumber = (str?: string) => Number.isNaN(parseInt(str??'')) ? 0  : parseInt(str??'')
+
+export const getRandomCoordinate = (min:number, max: number) => {
+  return (Math.random() * (max - min) + min).toFixed(6);
+}
 
 export const today = new Date();
 
