@@ -12,6 +12,11 @@ import Link from "next/link"
 import { NavigationMenuLink } from "@radix-ui/react-navigation-menu"
 import { Button } from "./ui/button"
 import axios from "axios"
+import { FormSelect } from "@/app/(private)/me/ads/create/fields"
+import { Select } from "./ui/select"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Label } from "./ui/label"
+import { toNumber } from "@/lib/utils"
 
 
 export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}) =>(
@@ -207,4 +212,67 @@ export const DesktopCategories = ({categories}:{ categories: Category[]}) => (
         </AccordionItem>
     </Accordion>
 )
+
+export const OrderBy = ({ setter }: { setter: (val: string)=> void }) => {
+    const [val, setVal] = useState('dist_meters')
+    const handleSetter = (e: string) => {
+        setVal(e)
+    }
+    useEffect(()=>{
+        setter(val)
+    }, [val])
+    return (
+        <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
+            <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
+                <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Order By</span><ChevronDown/></AccordionTrigger>
+                <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center w-full'>
+                    <RadioGroup value={ val } onValueChange={(e)=>{ handleSetter(e) }} className='flex flex-col gap-5 w-full h-fit px-8'>
+                        <div className="flex items-center space-x-2 text-xl w-full">
+                            <RadioGroupItem value="dist_meters" id={`r-dist_meters`} />
+                            <Label htmlFor={`r-dist_meters`} className=" text-xl">Distance</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 text-xl w-full">
+                            <RadioGroupItem value="price" id={`r-price`} />
+                            <Label htmlFor={`r-price`} className=" text-xl">Price</Label>
+                        </div>
+                    </RadioGroup>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    )
+}
+
+export const Distance = ({ setter }: { setter: (e?: string)=> void }) => {
+    const [val, setVal] = useState<string>()
+    const [error, setError] = useState(false);
+    
+    useEffect(()=>{  
+        if(toNumber(val) >= 500){
+            setError(false)
+            setter(val)
+            return
+        }
+        setError(true)
+        setVal(undefined)
+        setter(undefined)
+    }, [val])
+    return (
+        <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
+            <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
+                <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Max Distance</span><ChevronDown/></AccordionTrigger>
+                <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center w-full'>
+                    <p className="text-lg text-muted-foreground px-3">
+                        Please enter the distance in meters only.
+                    </p>
+                    <Input 
+                        type="number" 
+                        value={ val }
+                        onChange={ (e)=>{setVal(e.target.value)} }
+                        placeholder="Enter the distance here" 
+                        className={`w-full border text-xl ${ error && 'border-red-500'}`} />
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    )
+}
 

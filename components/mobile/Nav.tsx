@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Home, LogOut, Menu, Plus, User } from 'lucide-react'
 import { 
     NavigationMenu, 
@@ -19,6 +19,9 @@ import { MobileLinkItem } from '@/app/(private)/me/LinkItem'
 import { ScrollArea } from '../ui/scroll-area'
 import { createClient } from '@/lib/supabase/client'
 import { Category } from '@/lib/types'
+import axios from 'axios'
+import { setLocation } from '@/lib/actions/business_actions'
+import Cookies from 'js-cookie'
 
 type Props = {
     authenticated: boolean,
@@ -41,7 +44,6 @@ export default function Nav({ authenticated, categories }: Props) {
 
         console.log(error)
     }
-
 
   return (
     <NavigationMenu className='w-full'>
