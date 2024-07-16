@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { PriceRange, Rating } from './Fiters'
+import { Distance, OrderBy, PriceRange, Rating } from './Fiters'
 import { Button } from './ui/button'
 import Link from 'next/link'
 import { toNumber } from '@/lib/utils'
@@ -52,10 +52,13 @@ export  const  HomeFiltersContainer = ({}: Props) => {
     <div className='flex flex-col gap-5'>
         <PriceRange setter={ (range) => { setRange(range) } } error={ error } />
         <Rating setter={(num)=>{ setFilters({...filters, mar: num})}}/>
-
-        <Button className='w-full border-2 bg-transparent border-primary text-primary font-bold hover:text-primary-foreground'>
-          <Link href={ queryString }>Apply Filters</Link>
-        </Button>
+        <OrderBy setter={ (val)=> { setFilters({...filters, ordb: val})} } />
+        <Distance setter={ (val)=> { setFilters({...filters, mxd: val})} } />
+        <Link href={ queryString }>
+          <Button className='w-full border-2 bg-transparent border-primary text-primary font-bold hover:text-primary-foreground'>
+            Apply Filters
+          </Button>
+        </Link>
     </div>
   )
 }

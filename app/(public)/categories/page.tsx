@@ -5,10 +5,9 @@ import { getCategories } from '@/lib/actions/db_actions'
 import Link from 'next/link'
 import React from 'react'
 
-type Props = {}
-
-export default async function page({}: Props) {
+export default async function page() {
   const categories = await getCategories()
+  
   return (
     <Container clasName='pt-5'>
       <SearchBar includeLocation/>

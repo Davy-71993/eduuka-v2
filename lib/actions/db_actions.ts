@@ -3,10 +3,11 @@
 import { cookies } from "next/headers"
 import { createClient } from "../supabase/server"
 import { Ad, AdImage, Category, Profile, Store, SubCategory } from "../types"
+import { numberOrUndefine } from "../utils"
 
 
 // Category and SubCategory actions
-export const getCategories =  async(fields='name, id, slug, sub_categories(id, name, slug)') => {
+export const getCategories =  async(fields='name, id, slug, image, sub_categories(id, name, slug)') => {
     const supabase = createClient(cookies())
 
     const { data, error } = await supabase.from('categories').select(fields)
@@ -15,7 +16,8 @@ export const getCategories =  async(fields='name, id, slug, sub_categories(id, n
     return data as Category[]
 }
 
-export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, slug)') => {
+
+export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, image, slug)') => {
     const supabase = createClient(cookies())
     let query = supabase.from('categories').select(fields)
     Number.isNaN(parseInt(idOrSlug))
@@ -27,7 +29,7 @@ export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, 
     return data as Category
 }
 
-export const getSubCategory =  async(idOrSlug:string, fields='name, slug, image, categories(name, slug, image)') => {
+export const getSubCategory =  async(idOrSlug:string, fields='id, name, slug, image, categories(name, slug, image)') => {
     const supabase = createClient(cookies())
     let query = supabase.from('sub_categories').select(fields)
     Number.isNaN(parseInt(idOrSlug))
@@ -38,6 +40,7 @@ export const getSubCategory =  async(idOrSlug:string, fields='name, slug, image,
     if(error) throw error.message;
     return data as SubCategory
 }
+
 
 // Profile actions
 export const updateProfile = async(profile: Profile) => {
@@ -55,6 +58,7 @@ export const getProfile = async() => {
     if(error) throw error.message
     return data as unknown as Profile
 }
+
 
 // Storage actions
 export const uploadFile = async(bucket: string, file: File, path: string) => {
@@ -88,6 +92,7 @@ export const updateFile = async(bucket: string, newFile: File, path: string) => 
     return data
 }
 
+
 // Image actions
 export const createAdImage = async(image: AdImage) => {
     const supabase = createClient(cookies())
@@ -99,6 +104,7 @@ export const createAdImage = async(image: AdImage) => {
 
     return data as AdImage[]
 }
+
 
 // Ads actions
 export const uploadAd = async(adData: Ad) => {
@@ -131,6 +137,67 @@ export const getAdByID = async(id: string) => {
 export const getSimilarAds = async(ad: Ad | null) => {
     // Later edit this to return only similar ads to the one provided.
     return fetchAds()
+}
+
+export const updateAds = async(ads:Ad[]) => {
+    const supabase = createClient(cookies())
+    const { data, error } = await supabase.from('ads').upsert(ads).select()
+
+    if(error) return `An error occured: ${error.message}`;
+    return data as Ad[]
+}
+
+export const fetchNearbyAds = async(
+    limit:number, lat:number, long:number, 
+    q?: string, mxp?: string, mnp?: string, 
+    dist?:string, ordby?: string, cat?: string, subCat?: string) => {
+    const supabase = createClient(cookies())
+    let query = supabase.rpc('get_nearby_ads', {
+        lat,
+        long,
+    })
+    if(q){
+        query = query.or(`name.ilike.%${q}%, description.ilike.%${q}%`)
+    }
+    const min_price = numberOrUndefine(mnp)
+    const max_price = numberOrUndefine(mxp)
+    const mxd = numberOrUndefine(dist)
+    const c_id = numberOrUndefine(cat)
+    const sc_id = numberOrUndefine(subCat)
+
+    if(min_price){
+        console.log("Min Price", min_price)
+        query = query.or(`price.gte.${min_price}`)
+    }
+    if(max_price){
+        console.log("Max Price", max_price)
+        query = query.or(`price.lte.${max_price}`)
+    }
+    if(mxd){
+        query = query.lte('dist_meters', mxd)
+    }
+    !['price', 'dist_meters', undefined].includes(ordby) ? ordby = undefined : ordby = ordby
+    if(ordby){
+        query = query.order(ordby,{
+            ascending: true,
+            nullsFirst: false
+        })
+    }
+    if(c_id){
+        query = query.eq('category_id', c_id)
+    }
+    if(sc_id){
+        query = query.eq('sub_category_id', sc_id)
+    }
+    query = query.limit(limit)
+    const { data, error } = await query
+    
+    if(error){
+        console.log(error.message)
+        return []
+    }
+    return data as Ad[]
+
 }
 
 

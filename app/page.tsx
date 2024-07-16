@@ -22,33 +22,42 @@ import Link from "next/link"
 export default async function Home() {
   const categories = await getCategories()
   const stores = await fetchStores()
+  
   return (
     <Container clasName="pt-5">
       <SearchBar includeLocation />
       <div className="flex py-5 w-full">
-        <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col space-y-5 mb-10">
-          <h1 className="text-2xl">Extra filters.</h1>
+
+        {/* Filters */}
+        <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col gap-5 mb-10">
           <DesktopCategories categories={ categories } />
+          <h1 className="text-2xl">Extra filters.</h1>
           <HomeFiltersContainer />
         </div>
-        <div className="w-full md:w-[80%] flex flex-col space-y-5 md:px-5 overflow-hidden">
-          <Link href="/stores"><h1 className="text-2xl hover:text-blue-500 transition-colors">Popular Stores { ">>" }</h1></Link>
-          <ScrollArea className="w-full scroll whitespace-nowrap rounded-sm">
-            <div className="flex h-full space-x-4 rounded-sm">
-              {
-                stores.map((store, index)=>(
-                  <Link key={ index } href={`/stores/${store.id}`}>
-                    <StoreCard width="w-32 sm:w-56" store={ store } />
-                  </Link>
-                ))
-              }
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+        
+        <div className="w-full md:w-[80%] flex flex-col gap-5 md:px-5 overflow-hidden">
+          {
+            stores.length > 0 &&
+            <>
+              <Link href="/stores"><h1 className="text-2xl hover:text-blue-500 transition-colors">Popular Stores { ">>" }</h1></Link>
+              <ScrollArea className="w-full scroll whitespace-nowrap rounded-sm">
+                <div className="flex h-full space-x-4 rounded-sm">
+                  {
+                    stores.map((store, index)=>(
+                      <Link key={ index } href={`/stores/${store.id}`}>
+                        <StoreCard width="w-32 sm:w-56" store={ store } />
+                      </Link>
+                    ))
+                  }
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </>
+          }
+          {/* Recomended ads ordered by distance from the user. */}
+          <h1 className="text-2xl">Trending Ads</h1>
+          <AdsList limit={12}/>
 
-          {/* Trending Ads */}
-          
-          <AdsList />
           {/* Link to the find page */}
           <div className="w-full flex justify-end py-5">
             <Link href={'/find'} className="p-2 sm:p-3 bg-primary hover:bg-primary/80 transition-opacity rounded-sm text-primary-foreground font-bold text-sm sm:text-xl">Continue To All Ads {" >>"}</Link>

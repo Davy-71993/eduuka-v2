@@ -1,26 +1,16 @@
-import React, { useEffect, useState } from 'react'
+
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { setLocation } from '@/lib/actions/business_actions'
-import axios from 'axios'
 
 type Props = {
     className?: string
 }
 
 export default function LocationSelector({ className }: Props) {
-    
-    useEffect(()=>{
-        (async()=>{
-            const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
-            console.log(res.data)
-            await setLocation(res.data)
-        })()
-    }, [])
   return (
     <Dialog>
         <DialogTrigger asChild>

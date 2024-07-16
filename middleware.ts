@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authMiddleware } from './middlewares'
  
 export default async function middleware(request: NextRequest) {
-    return authMiddleware(request)
+  return authMiddleware(request)
 
 }
  

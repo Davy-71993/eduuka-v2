@@ -69,9 +69,11 @@ export type Ad = {
     sub_category_id?: string,
     category_id?: number,
     store_id?: string,
+    dist_meters?: number
     views?: number
     trashed_at?: string,
     ad_details?: string,
+    image?: string,
     location?: string,
     pricing_scheme?: string, // "Fixed" | "Price Range" | "Periodic",
     min_price?: number,
@@ -84,7 +86,7 @@ export type Ad = {
     ad_promotions?: AdPromotion,
     ad_images?: AdImage[],
     profiles?: Profile,
-    rating?: number
+    rating?: number,
 }
 
 export type AdLocation = {
