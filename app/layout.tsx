@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/providers/theme-provider";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import Chat from "@/components/Chat";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", });
 
@@ -37,8 +39,11 @@ export default async function RootLayout({
           > */}
             
             <NavBar />
-            <div className="pt-[4.5rem] sm:pt-24 pb-10 min-h-[70vh]">
+            <div className="pt-[4.5rem] sm:pt-24 relative pb-10 min-h-screen">
               {children}
+              <Suspense fallback={ "Loading..." }>
+                <Chat />
+              </Suspense>
             </div>
             <Footer />
           {/* </ThemeProvider> */}

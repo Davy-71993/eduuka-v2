@@ -21,7 +21,7 @@ export default async function NavBar({}: Props) {
     <div className='w-full bg-primary text-primary-foreground py-3 sm:py-5 drop-shadow-lg z-10 fixed top-0 right-0'>
         <Container clasName="h-full">
             <div className="flex justify-between">
-              <Link href={'/'}>
+              <Link href={'/find'}>
                 <button className="bg-primary-foreground px-3 py-1 sm:text-2xl sm:py-2 rounded font-bold text-xl text-primary">DUUKA</button>
               </Link>
               <div className="flex w-full justify-end space-x-5 items-center">

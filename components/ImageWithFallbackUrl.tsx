@@ -17,14 +17,16 @@ export default function ImageWithFallbackUrl({ src, className, alt }: Props) {
   }, [src])
 
   return (
-    <Image 
-      onError={ (e)=>{ 
-        setImageUrlError(true)
-      }}
-      src={ imageUrlError ? '/images/no_img.jpg' : src ?? '' } 
-      alt={alt ?? 'Image' } 
-      height={1000} width={1000} 
-      className={ className }
-    />
+    <div className="relative w-full h-full">
+      <Image 
+        onError={ (e)=>{ 
+          setImageUrlError(true)
+        }}
+        src={ imageUrlError ? '/images/no_img.jpg' : src ?? '' } 
+        alt={alt ?? 'Image' } 
+        fill
+        className={ className }
+      />
+    </div>
   )
 }

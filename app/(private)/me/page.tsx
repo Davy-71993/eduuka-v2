@@ -9,10 +9,14 @@ import React from 'react'
 import { EditProfile, PersonalInfo, ProfileImageCard, UserData } from './ProfileSegments'
 import { getProfile } from '@/lib/actions/db_actions'
 import { Lock, User } from 'lucide-react'
+import { redirect } from 'next/navigation'
+
 
 export default async function page({ searchParams }: { searchParams: any}) {
   const profile  = await getProfile()
-
+  if(!profile){
+    return redirect('/me/create-profile')
+  }
   return (
     <div className='flex flex-col sm:flex-row-reverse h-full'>
      <div className="w-full sm:w-1/3 h-fit sm:h-full bg-secondary text-center px-3 flex flex-col space-y-2 py-5">

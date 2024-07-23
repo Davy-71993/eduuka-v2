@@ -2,12 +2,12 @@
 
 import { cookies } from "next/headers"
 import { createClient } from "../supabase/server"
-import { Ad, AdImage, Category, Profile, Store, SubCategory } from "../types"
+import { Ad, AdImage, Category, Chat, MenuItem, Message, Profile, Store, SubCategory } from "../types"
 import { numberOrUndefine } from "../utils"
 
 
 // Category and SubCategory actions
-export const getCategories =  async(fields='name, id, slug, image, sub_categories(id, name, slug)') => {
+export const getCategories =  async(fields='name, id, slug, image, ads(count), sub_categories(id, name, slug)') => {
     const supabase = createClient(cookies())
 
     const { data, error } = await supabase.from('categories').select(fields)
@@ -17,7 +17,7 @@ export const getCategories =  async(fields='name, id, slug, image, sub_categorie
 }
 
 
-export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, image, slug)') => {
+export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, image, slug, ads(count))') => {
     const supabase = createClient(cookies())
     let query = supabase.from('categories').select(fields)
     Number.isNaN(parseInt(idOrSlug))
@@ -50,20 +50,49 @@ export const updateProfile = async(profile: Profile) => {
     return data as Profile
 }
 
-export const getProfile = async() => {
-    
+export const getProfile = async(id?: string) => {
     const supabase = createClient(cookies())
-    const { data:{ user } } = await supabase.auth.getUser()
-    const { data, error} = await supabase.from('profiles').select('*').eq('id', user?.id).single()
-    if(error) throw error.message
+    let profile_id = id
+    if(!profile_id){
+        const { data:{ user } } = await supabase.auth.getUser()
+        profile_id = user?.id
+
+    }
+    if(!profile_id){
+        console.log("Could not fetch profile because no id was specified")
+        return
+    }
+
+    const { data, error} = await supabase.from('profiles').select('*').eq('id', profile_id).single()
+    if(error){
+        console.log("Could not fetch profile because no id was specified")
+        return
+    }
     return data as unknown as Profile
 }
+
+export const getUsername = async(id: string) => {
+    const supabase = createClient(cookies())
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', id)
+        .single()
+
+    if(error){
+        console.log("An error occured while fetching profile image.", error.message)
+        return
+    }
+
+    return data.username as string
+}
+
 
 
 // Storage actions
 export const uploadFile = async(bucket: string, file: File, path: string) => {
     const supabase = createClient(cookies())
-    console.log('here')
+    
     const { data, error } = await supabase
         .storage
         .from(bucket)
@@ -72,9 +101,12 @@ export const uploadFile = async(bucket: string, file: File, path: string) => {
             upsert: true
         })
 
-    if(error) throw error.message
+    if(error){
+        console.log("An error occured while uploading file.", error.message)
+        return
+    }
 
-    return data
+    return data.path
 }
 
 export const updateFile = async(bucket: string, newFile: File, path: string) => {
@@ -97,12 +129,13 @@ export const updateFile = async(bucket: string, newFile: File, path: string) => 
 export const createAdImage = async(image: AdImage) => {
     const supabase = createClient(cookies())
 
-    const { data, error } = await supabase.from('ad_images').insert(image).select()
+    const { data, error } = await supabase.from('ad_images').insert(image).select().single()
     if (error) {
-        throw new Error(error.message)
+        console.log(error.message)
+        return null
     }
 
-    return data as AdImage[]
+    return data as AdImage
 }
 
 
@@ -110,33 +143,61 @@ export const createAdImage = async(image: AdImage) => {
 export const uploadAd = async(adData: Ad) => {
     const supabase = createClient(cookies())
 
-    const { data, error } = await supabase.from('ads').insert(adData).select('id, name, price, ad_images(url)').single()
-    if(error) throw error.message;
-
+    const { data, error } = await supabase.from('ads').insert(adData).select('id, name').single()
+    if(error){
+        console.log(error.message)
+        return null
+    }
     return data as Ad
 }
 
-export const fetchAds = async(fields?:string) => {
+export const getUserAds = async() => {
     const supabase = createClient(cookies())
-    const { data, error } = await supabase.from('ads').select(fields ?? 'id, price, name, ad_images(url)')
-            
-    if(error) throw error.message
-                                        
-    return data as Ad[]
+    const { data, error } = await supabase.from('user_ads').select()
+    if(error){
+        console.log("An error occured while fetching user ads. ", error.message)
+        return []
+    }
 
+    return data as Ad[]
 }
 
 export const getAdByID = async(id: string) => {
     const supabase = createClient(cookies())
-    const { data, error } = await supabase.from('ads').select('*').eq('id', id)
+    const { data, error } = await supabase.from('ads').select('*, profiles(first_name, last_name, image, phone), ad_images(url), menu_items(item, price)').eq('id', id).single()
 
-    if(error) return null
+    if(error) return
     return data as Ad
 }
 
-export const getSimilarAds = async(ad: Ad | null) => {
-    // Later edit this to return only similar ads to the one provided.
-    return fetchAds()
+export const getStoreAds = async(storeID: string) => {
+    const supabase = createClient(cookies())
+    const { data, error } = await supabase.from('ads_with_image_url').select().eq('store_id', storeID)
+    if(error){
+        console.log("An error occured while fetching store ads. ", error.message)
+        return []
+    }
+
+    return data as Ad[]
+}
+
+export const getSimilarAds = async(lat: number, long: number, ad_id?:string, cat_id?: number, sub_cat_id?: string) => {
+    
+    const supabase = createClient(cookies())
+    let query = supabase.rpc('get_nearby_ads', { lat, long, }).neq('id', ad_id)
+    if(cat_id){
+        query = query.or(`category_id.eq.${cat_id}`)
+    }
+    if(sub_cat_id){
+        query = query.or(`sub_category_id.eq.${sub_cat_id}`)
+    }
+    
+    const { data, error } = await query
+    if(error){
+        console.log("An error coured while fetching similar ads. ", error.message)
+        return []
+    }
+    return data as Ad[]
 }
 
 export const updateAds = async(ads:Ad[]) => {
@@ -148,7 +209,7 @@ export const updateAds = async(ads:Ad[]) => {
 }
 
 export const fetchNearbyAds = async(
-    limit:number, lat:number, long:number, 
+    lat:number, long:number, 
     q?: string, mxp?: string, mnp?: string, 
     dist?:string, ordby?: string, cat?: string, subCat?: string) => {
     const supabase = createClient(cookies())
@@ -189,15 +250,41 @@ export const fetchNearbyAds = async(
     if(sc_id){
         query = query.eq('sub_category_id', sc_id)
     }
-    query = query.limit(limit)
+    query = query.limit(45)
     const { data, error } = await query
     
     if(error){
         console.log(error.message)
         return []
     }
+    
     return data as Ad[]
 
+}
+
+export const getAdImage = async(ad_id: string) => {
+    const supabase = createClient(cookies())
+    const { data, error } = await supabase
+        .rpc('get_image_url', {
+            ad_id: ad_id
+        })
+
+    if(error){
+        console.log("Error fetching the ad image url. ", error.message)
+        return
+    }
+
+    return data as string
+}
+
+export const fetchMenuItems = async(ad_id: string) => {
+    const supabase = createClient(cookies())
+    const { data, error } = await supabase.from('menu_items').select('item, price').eq('ad_id', ad_id)
+    if(error){
+        console.log("Error fetching menu items")
+        return []
+    }
+    return data as MenuItem[]
 }
 
 
@@ -226,3 +313,43 @@ export const fetchStoreByID = async(id: string) => {
     if(error) return null
     return data as Store
 }
+
+
+// Chat messages
+export const fetchMessages = async(ad_id?: string) => {
+    const supabase = createClient(cookies())
+    let query = supabase.from('messages').select('body, sender_id, ad_id, recipient_id, created_at')
+    if(ad_id){
+        query = query.eq('ad_id', ad_id)
+    }
+    const { data, error } = await query.order('created_at')
+    if(error){
+        console.log("An error occured while fetching messages.", error.message)
+        return []
+    }
+
+    return data as Message[]
+}
+
+export const getMessages = async () => {
+    const supabase = createClient(cookies())
+    const { data, error } = await supabase
+        .from('messages')
+        .select('body, sender_id, ad_id, recipient_id')
+        .order('created_at')
+    if(error){
+        console.log("An error occured while fetching messages.", error.message)
+        return []
+    }
+
+    return data as Message[]
+}
+
+export const sendMessage = async(message: Message)=>{
+    const supabase = createClient(cookies())
+    const { error } = await supabase.from('messages').insert(message)
+
+    if(error){
+        console.log("Error sending message. ", error.message)
+    }
+} 

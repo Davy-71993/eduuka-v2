@@ -1,15 +1,14 @@
-// "use client"
-import AdCard from '@/components/AdCard'
+
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import { Button } from '@/components/ui/button'
-import { getAdByID, getSimilarAds } from '@/lib/actions/db_actions'
-import { createClient } from '@/lib/supabase/server'
-import { Check, Star } from 'lucide-react'
-import { cookies } from 'next/headers'
-import Image from 'next/image'
+import { getAdByID } from '@/lib/actions/db_actions'
 import Link from 'next/link'
 import React from 'react'
+import ProfileCard from './(parts)/ProfileCard'
+import ImageWithFallbackUrl from '@/components/ImageWithFallbackUrl'
+import SimilarAdsList from '@/components/SimilarAdsList'
+import PricePanel from '@/components/PricePanel'
 
 type Props = {
   params: any,
@@ -18,10 +17,8 @@ type Props = {
 
 export default async function page({ params, searchParams }: Props) {
   const aid = params.aid
-
   const ad = await getAdByID(aid)
-  const similarAds = await getSimilarAds(ad)
-
+  
   const numberOrZer0 = (str: string) => {
     const index =  Number.isNaN(parseInt(str)) ? 1 : parseInt(str)
     return index > ad?.ad_images?.length! ? 1 : index
@@ -64,33 +61,34 @@ export default async function page({ params, searchParams }: Props) {
 
   return (
     <Container clasName='pt-5' >
-      <SearchBar includeLocation />
+      <SearchBar toUrl='/find' includeLocation />
       <div className='sm:flex sm:space-x-5 mt-5'>
         <div className="bg-secondary w-full sm:w-[60%] xl:w-[50%]">
-          <div className="p-5 w-full h-[50vh]">
+          <div className="p-5 w-full h-[50vh] object-cover overflow-hidden relative">
             {
               ad.ad_images &&
-              <Image 
+              <ImageWithFallbackUrl
                 src={ ad.ad_images[numberOrZer0(searchParams['img'])-1]?.url ?? ''} 
                 alt='Priority Ad Image' 
-                height={1500} width={1500} 
-                className='w-full mx-auto hover:scale-110 rounded-sm transition-all h-auto' 
+                className='w-full mx-auto hover:scale-110 object-contain rounded-sm transition-all h-auto' 
               />
             }
           </div>
-          <div className="flex border-t p-2 h-24 overflow-hidden space-x-2">
+          <div className="flex border-t p-5 h-fit overflow-hidden space-x-2">
             {
               ad?.ad_images?.map((image, index)=>(
-                <Link key={ index } href={`?img=${index+1}`} className='block h-full'>
-                  <Image 
+                <Link key={ index } href={`?img=${index+1}`} className='h-16 relative w-20'>
+                  <ImageWithFallbackUrl 
                     src={ image?.url || ''} 
                     alt='Priority Ad Image' 
-                    height={100} width={100} 
-                    className='w-full max-w-24 border h-auto' 
+                    className='w-full h-auto object-contain' 
                   />
                 </Link>
               ))
             }
+          </div>
+          <div className="p-5 w-full">
+            { ad.description }
           </div>
           <div className="hidden sm:block">
             <h1 className="text-xl mt-5 pl-5 border-b">Extra Details</h1>
@@ -102,34 +100,8 @@ export default async function page({ params, searchParams }: Props) {
           </div>
         </div>
         <div className="w-full sm:w-[40%] xl:w-[50%] mt-5 h-fit sm:mt-0 xl:grid xl:gap-5 grid-cols-2">
-          <div className="bg-secondary w-full p-5">
-            <h1 className="text-2xl md:text-4xl font-bold mb-5 text-primary">USH {" " + ad?.price}</h1>
-            <p className="text-accent-foreground mb-5 line-clamp-2 text-2xl">{ ad?.description }</p>
-            {
-              // Add a condition to check if the details object includes negotiable and it is true
-              details['negotiable'] &&
-              <div className='px-5 py-2 mb-5 bg-card text-xl font-bold rounded-sm w-full flex justify-between items-center'>
-                <span className=''>Negotiable</span><Check size={32} className='border-2 border-foreground font-bold rounded-full p-1 h-8 w-8' />
-              </div>
-            }
-            <div className="border rounded-sm px-5 py-3 text-sm ">Market price: USH 45000 - 60000</div>
-          </div>
-          <div className="bg-secondary mt-5 xl:mt-0 w-full p-5 h-fit">
-            <Link href={`/dealers/${ad?.seller_id}`} className='hover:text-primary transition-colors block w-full'>
-              <Image 
-                src={'/profile.jpg'} alt='Seller Image' height={100} width={100} 
-                className='rounded-full mx-auto' />
-              <h1 className="text-lg text-center pt-2">{ ad.profiles?.first_name } { ad.profiles?.last_name }</h1>
-              <div className="flex justify-evenly py-2 w-full">
-                <p className="text-foreground/50 w-fit">6 ads</p>
-                <div className="w-fit flex text-yellow-500">
-                  <Star /><Star /><Star /><Star /><Star />
-                </div>
-              </div>
-            </Link>
-            <Button className='w-full font-bold mt-5' >Show Contact</Button>
-            <Button variant="outline" className='w-full font-bold mt-5 border-primary text-primary' >Start Chat</Button>
-          </div>
+          <PricePanel ad={ ad } />
+          <ProfileCard scheme={ ad.pricing_scheme } profile={ ad.profiles }  />
           <div className="col-span-2 hidden sm:block bg-secondary p-5 mt-5 xl:mt-0">
             <h1 className="text-center text-2xl">Tips to be safe from conmen</h1>
             <p className='py-1 list-disc text-lg list-item ml-5'>Avoid paying in advance, even for delivery</p>
@@ -155,13 +127,7 @@ export default async function page({ params, searchParams }: Props) {
       <div className="w-full flex flex-col space-y-3 overflow-hidden">
         <h1 className="text-2xl mt-5">Similar Ads.</h1>
         {/* filtered Ads */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full">
-          {
-            similarAds.slice(0,6).map((ad, index)=>(
-              <AdCard key={index} ad={ad} />
-            ))
-          }
-        </div>
+        <SimilarAdsList ad={ ad }/>
       </div>
     </Container>
   )

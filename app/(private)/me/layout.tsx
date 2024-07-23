@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/resizable"
 import Container from '@/components/Container'
 import { Button } from '@/components/ui/button'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
 import LinkItem from './LinkItem'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { getProfile } from '@/lib/actions/db_actions'
-import { Profile } from '@/lib/types'
   
 
 type Props = {
@@ -22,7 +21,22 @@ type Props = {
 }
 
 export default function DashboardLayout({ children }: Props) {
+
+     /**
+     * Try to figure out how we can implement 
+     * the resize behaviour on resize and scroll
+     */
+    
     const pathname = usePathname()
+    const router = useRouter()
+    useEffect(()=>{
+      (async()=>{
+       const profile = await getProfile()
+       if(!profile){
+           return router.push('/me/create-profile')
+       }
+      })()     
+   }, [pathname])
     const title = DASHBOARD_LINKS.find(link => link.url === pathname)?.title
     const setPanelSize = (size: number, changeSize: number) => {
         const panel = document.querySelector('.nav-panel')
@@ -70,26 +84,6 @@ export default function DashboardLayout({ children }: Props) {
         }, 1000)
     }, [dateTime])
     
-    const [profile, setProfile] = useState<Profile>()
-    /**
-     * Try to figure out how we can implement 
-     * the resize behaviour on resize and scroll
-     */
-    useEffect(()=>{
-        // const { nav_panel_width, page_panel_width } = getPanelWidth()
-        
-        // window.onresize = ()=> {
-        //     const width = (nav_panel_width + page_panel_width)*20/100
-        //     console.log(width, nav_panel_width, page_panel_width)
-        //     // setPanelSize(width, 215)
-        // } 
-            
-        const handleFetchProfile = async() => {
-            const profile = await getProfile()
-            setProfile(profile)
-        }
-        handleFetchProfile()
-    }, [])
 
   return (
     <Container clasName='pt-2'>

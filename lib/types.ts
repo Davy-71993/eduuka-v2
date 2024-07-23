@@ -28,7 +28,8 @@ export type Profile = {
     sex?: string,
     dob?: string,
     email?: string,
-    phone?: string
+    phone?: string,
+    username?: string
 }
 
 
@@ -39,6 +40,15 @@ export type Category = {
     sub_categories?: SubCategory[],
     ads?: Ad[],
     slug?: string
+}
+
+export type GeoData = {
+    country: string,
+    region: string,
+    city: string,
+    lat: number,
+    lon: number,
+    currency: string
 }
 
 export type SubCategory = {
@@ -74,7 +84,7 @@ export type Ad = {
     trashed_at?: string,
     ad_details?: string,
     image?: string,
-    location?: string,
+    location?: string | any,
     pricing_scheme?: string, // "Fixed" | "Price Range" | "Periodic",
     min_price?: number,
     max_price?: number,
@@ -87,6 +97,14 @@ export type Ad = {
     ad_images?: AdImage[],
     profiles?: Profile,
     rating?: number,
+    count?: number,
+    default_currency?: string,
+    menu_items?: MenuItem[]
+}
+
+export type MenuItem = {
+    item: string,
+    price: string 
 }
 
 export type AdLocation = {
@@ -104,6 +122,13 @@ export type AdRating = {
     value?: number,
     ad_id?: number,
     client_id?: string
+}
+
+export type Message = {
+    sender_id: string,
+    body: string,
+    ad_id: string,
+    recipient_id: string
 }
 
 export type AdImage = {
@@ -181,12 +206,10 @@ export type ChatFile = {
 
 export type Notification = {
     id: string,
-    type?: "General" | "Warning" | "Danger",
-    to?: Profile,
     to_id: string,
     message: string,
-    date: Date,
-    status: "Read" | "Unread" | "Undelivered"
+    created_at: string,
+    status: "read" | "delivered" | "seen"
 }
 
 export type Address = {
