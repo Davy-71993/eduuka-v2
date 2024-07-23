@@ -3,9 +3,7 @@ import Container from '@/components/Container'
 import FadingLine from '@/components/FadingLine'
 import { DesktopCategories, PriceRange, Rating } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
-import { fetchAds, fetchStoreByID, getCategories } from '@/lib/actions/db_actions'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { getStoreAds, fetchStoreByID, getCategories } from '@/lib/actions/db_actions'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -16,10 +14,9 @@ type Props = {
 
 export default async function StorePage({ params }: Props) {
     const storeID = params['sid']
-    const supabase = createClient(cookies())
     const store = await fetchStoreByID(storeID)
     const categories = await getCategories()
-    const ads = await fetchAds()
+    const ads = await getStoreAds(storeID)
 
     if(!store) return null;
   return (
@@ -42,7 +39,7 @@ export default async function StorePage({ params }: Props) {
                 <div className="grid gap-4 mb-5 pb-5 grid-cols-2 lg:grid-cols-3 w-full">
                     {
                         ads.map((ad, index)=>(
-                        <AdCard key={index} ad={ad} />
+                        <AdCard currency='UGX' key={index} ad={ad} />
                         ))
                     }
                 </div>
@@ -52,7 +49,7 @@ export default async function StorePage({ params }: Props) {
                     <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
                         {
                             ads.map((ad, index)=>(
-                            <AdCard key={index} ad={ad} />
+                            <AdCard currency='UGX' key={index} ad={ad} />
                             ))
                         }
                     </div>

@@ -3,7 +3,8 @@ import { createAdImage, getCategories, insertLocations, uploadAd } from "../acti
 import { createClient } from "../supabase/client"
 import axios from 'axios'
 import { Ad } from "../types"
-import { getRandomCoordinate } from "../utils"
+import { generateCoordinates, getRandomCoordinate } from "../utils"
+import { data } from "@/trash/dami-data"
 
 export const SUPABASE = createClient()
 
@@ -56,53 +57,131 @@ export const seedCategories = () => {
     // })
 }
 
-export const seedAds = async(fromUrl?: string) => {
-    // const url = fromUrl ?? 'https://api.escuelajs.co/api/v1/products'
-    // const res = (await axios.get(url)).data
-    // console.log(res.length)
-    // const categories = await getCategories('id, name')
+export const seedAds = async() => {
+    const {
+        phones, 
+        computers, 
+        electronics, 
+        fashion, 
+        furniture, 
+        health_and_beauty, 
+        real_estate, 
+        vehicles_and_cars
+    } = data
 
-    // const numberOrUndefined = (str: string) => Number.isNaN(parseInt(str)) ? undefined : parseInt(str) 
+    const updatedPhones: Ad[] = phones.map((phone)=>{
+        const { id, name, price, description, ...rest } = phone
+        return {
+            name, brand: rest.brand, pricing_scheme: "fixed price", 
+            price, description, ad_details: JSON.stringify(rest),
+            category_id: 97,
+            sub_category_id: '96'
+        }
+    })
 
-    // res.forEach(async(item: any)=>{
-    //     const { title, description, price, category , images} = item
-    //     const ad: Ad = {
-    //         name: title,
-    //         description,
-    //         price,
-    //         category_id: numberOrUndefined((()=>categories.find((cat)=> cat.name === category.name))()?.id ?? '')??102,
-    //         status: 'Draft',
-    //         pricing_scheme: 'fixed price'
-    //     }
-    //     const cleanArray = images.length === 1 && images[0].startsWith('[') ? JSON.parse(images[0]) : images
-        
-    //     if(!cleanArray || !cleanArray.length){
-    //         console.log('No images for this ad')
-    //         return
-    //     }
-        
-    //     try {
-    //         const res = await uploadAd(ad)
-    //         const longitude = getRandomCoordinate(30.000000, 35.000000)
-    //         const latitude = getRandomCoordinate(-1.000000, 4.000000)
-    //         try {
-    //             insertLocations([{
-    //                 ad_id: res.id!,
-    //                 geo: `POINT(${longitude} ${latitude})`
-    //             }])
-    //         } catch (error) {
-    //             console.log("The Location could not be uploaded.", error)
-    //         }
-    //         cleanArray.forEach(async(url: string)=>{
-    //             try {
-    //                 await createAdImage({ad_id: res.id, url})
-                    
-    //             } catch (error) {
-    //                 console.log("The Image could not be uploaded", error)
-    //             }
-    //         })
-    //     } catch (error) {
-    //         console.log("The ad could not be uploaded", error)
-    //     }
+    const updatedComputers: Ad[] = computers.map((computer) => {
+        const { type, model, brand, price, description, specs } = computer
+        return {
+            name: `${brand} ${model} ${type}`, price, description,
+            pricing_scheme: "fixed price", brand,
+            ad_details: JSON.stringify({...specs, brand }),
+            category_id: 98
+        }
+    }) 
+
+    const updatedElectronics: Ad[] = electronics.map((electronic) => {
+        const { id, name, price, description, brand, specs, features, modelYear, color } = electronic
+        const details = {...specs, features, modelYear, color}
+        return {
+            name: `${brand} ${name}`, price, description, brand,
+            ad_details: JSON.stringify(details),
+            pricing_scheme: "fixed price",
+            category_id: 93
+        }
+    })
+
+    const updatedFashion: Ad[] = fashion.map((f)=> {
+        const { category, color, description, id, name, price, size } = f
+        const generateSubCatID = (cate: string) => {
+            if(cate === "Men's Clothing") return  84;
+            if(cate === "Women's Clothing") return 76;
+            if(cate === "Footwear") return 85;
+            if(cate === "Activewear" || cate === "Outerwear") return 105;
+            return undefined;
+        }
+        return {
+            name, price, description, pricing_scheme: "menu",
+            category_id: 94,
+            sub_category_id: generateSubCatID(category) && `${generateSubCatID(category)}`,
+            ad_details: JSON.stringify({color, sizes: [...size]})
+        }
+    }) 
+
+    const updatedFurniture: Ad[] = furniture.map(f => {
+        const { id, name, description, price, ...rest } = f
+        return { 
+            name, price, description,
+            ad_details: JSON.stringify(rest),
+            pricing_scheme: "fixed price",
+            category_id: 99
+        }
+    })
+
+    const updatedHealthAndBeauty: Ad[] = health_and_beauty.map(hb => {
+        const { id, name, price, description, ...rest } = hb
+        return {
+            name, price, description, brand: rest.brand,
+            pricing_scheme: "fixed price",
+            category_id: 96,
+            ad_details: JSON.stringify(rest)
+        }
+    })
+
+    const updatedRealEstates: Ad[] = real_estate.map(re => {
+        const { id, type, price, location, description, ...rest } = re
+        return { name: type, price, description, address: location,
+            pricing_scheme: "periodic price",
+            pricing_period: "Monthly",
+            ad_details: JSON.stringify(rest),
+            category_id: 95,
+            sub_category_id: '100'
+        }
+    })
+
+    const updatedCars: Ad[] = vehicles_and_cars.map(cars => {
+        const { id, price, description, ...rest } = cars
+        return {
+            name: `${rest.make} ${rest.model} ${rest.year}`,
+            price, description, pricing_scheme: "fixed price",
+            category_id: 100,
+            sub_category_id: '79',
+            ad_details: JSON.stringify(rest)
+        }
+    })
+
+    const newData = [
+        ...updatedComputers,
+        ...updatedElectronics,
+        ...updatedFashion,
+        ...updatedFurniture,
+        ...updatedHealthAndBeauty,
+        ...updatedRealEstates,
+        ...updatedCars,
+        ...updatedPhones
+    ]
+
+    // newData.forEach(async(phone) => {
+    //     const { lat, lon } = generateCoordinates()
+    //     const location = `POINT(${lon} ${lat})`
+    //     const ad = await uploadAd({...phone, location })
+    //     if(!ad) return
+    //     const { id, name } = ad
+
+    //     const imageUrl = `/images/ads/${name}.png`
+    //     await createAdImage({
+    //         url: imageUrl,
+    //         ad_id: id
+    //     })
     // })
+
 }

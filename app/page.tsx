@@ -55,8 +55,7 @@ export default async function Home() {
             </>
           }
           {/* Recomended ads ordered by distance from the user. */}
-          <h1 className="text-2xl">Trending Ads</h1>
-          <AdsList limit={12}/>
+          <AdsList />
 
           {/* Link to the find page */}
           <div className="w-full flex justify-end py-5">

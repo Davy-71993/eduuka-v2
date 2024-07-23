@@ -1,7 +1,7 @@
 "use client"
 
-import { usePathname, useSearchParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import React, { useCallback, useState } from 'react'
 import { Distance, OrderBy, PriceRange, Rating } from './Fiters'
 import { Button } from './ui/button'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ export  const  HomeFiltersContainer = ({}: Props) => {
 
   const queryString = useSearchQuery(filters, searchParams)
 
-  const setRange = (range?: { min?: string, max?: string}) => {
+  const setRange = useCallback((range?: { min?: string, max?: string}) => {
     // If the range is not given, no error and no mxp and no mnp
     if(!range){
       setFilters({...filters, mxp: undefined, mnp: undefined })
@@ -46,12 +46,12 @@ export  const  HomeFiltersContainer = ({}: Props) => {
     setFilters({...filters, mxp: range?.max, mnp: range?.min })
     setError(undefined)
     return
-  }
+  }, [filters])
 
   return (
     <div className='flex flex-col gap-5'>
         <PriceRange setter={ (range) => { setRange(range) } } error={ error } />
-        <Rating setter={(num)=>{ setFilters({...filters, mar: num})}}/>
+        {/* <Rating setter={(num)=>{ setFilters({...filters, mar: num})}}/> */}
         <OrderBy setter={ (val)=> { setFilters({...filters, ordb: val})} } />
         <Distance setter={ (val)=> { setFilters({...filters, mxd: val})} } />
         <Link href={ queryString }>
