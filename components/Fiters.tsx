@@ -14,6 +14,7 @@ import { Button } from "./ui/button"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Label } from "./ui/label"
 import { toNumber } from "@/lib/utils"
+import SlideToLeft from "./animated/SlideToLeft"
 
 
 export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}) =>(
@@ -181,33 +182,27 @@ export const MobileCategories = ({categories}:{ categories: Category[]}) => (
 )
 
 export const DesktopCategories = ({categories}:{ categories: Category[]}) => (
-    <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary h-fit max-h-full rounded-sm">
-        <AccordionItem value="categories" className='w-full flex flex-col border-none border-t px-2 h-full'>
-            <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm">
-                <span>Categories</span> <ChevronDown/>
-            </AccordionTrigger>
-            <AccordionContent className="flex-1">
-                <Accordion collapsible type='single' className='w-full border-none pr-4'>
-                    {categories.map((cat, i) => (
-                        <AccordionItem value={ ''+i+1 } key={ i+1 } className='w-full px-3 transition-colors hover:bg-background border-none rounded-sm'>
-                            <AccordionTrigger className="w-full text-xl p-2 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm">{ cat.name }</AccordionTrigger>
-                            <AccordionContent className='flex flex-col text-left'>
-                                {
-                                    cat.sub_categories?.map((scat, sci)=>(
-                                        <Link key={sci} className='flex p-2 rounded-sm hover:bg-secondary text-left transition-all' href={`/categories/${cat.slug}/${scat.slug}`}>
-                                            { scat.name }
-                                        </Link>
-                                    ))
-                                }
-                                <Link className="w-full hover:text-blue-500 p-2 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href={`/categories/${cat.slug}`}>All { cat.name }</Link>
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                    <Link className="w-full hover:text-blue-500 text-xl py-2 px-5 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href="/categories">All Categories</Link>
-                </Accordion>
-            </AccordionContent>
-        </AccordionItem>
-    </Accordion>
+    <div className="rounded-sm w-full">
+        <Link href={'/categories'} className="px-5 py-3 bg-blue-400 hover:bg-blue-500 text-muted rounded-t-sm w-full block border-b text-lg">See all Categories</Link>
+        {
+            categories.map((cate, index) => (
+                <SlideToLeft key={ index } title={ cate.name } className={index === categories.length-1 ? 'rounded-b-sm' : ''}>
+                    {
+                        (cate.sub_categories??[]).length  > 0 &&
+                        <div className="w-full max-w-60 rounded-sm z-50">
+                            <Link href={`/categories/${cate.slug}`} className="px-5 py-3 bg-blue-400 hover:bg-blue-500 text-muted rounded-t-sm w-full block border-b text-lg">See all in { cate.name}</Link>
+                            {
+                                cate.sub_categories?.map((scate, ind)=>(
+                                    <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } className={`bg-blue-400 border-b border-muted text-muted px-5 block w-full py-2 min-w-60 hover:bg-blue-500 ${ ind === (cate.sub_categories??[]).length-1 ? 'rounded-b-sm' : ''}`}>{ scate.name }</Link>
+                                ))
+                            }
+                        </div>
+                    }
+                </SlideToLeft>
+            ))
+        }
+    </div>
+   
 )
 
 export const OrderBy = ({ setter }: { setter: (val: string)=> void }) => {

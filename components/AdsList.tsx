@@ -1,25 +1,17 @@
 "use client"
 
-import { useFetchAds } from '@/lib/hooks'
+import { useFetchAds, useGeoData } from '@/lib/hooks'
 import AdCard from './AdCard'
 import AdListSkelton from './AdListSkelton '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import Cookies from 'js-cookie'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function AdsList({ cat, subCat }: { cat?: string, subCat?: string }) {
   
+  const geoData = useGeoData()
   const { ads, loading } = useFetchAds(cat, subCat)
-  
-  const [currency, setCurrency] = useState<string>("USD")
-
-
-  useEffect(()=>{
-    const c = JSON.parse(Cookies.get('geo')??"{}").currency
-    if(c){
-      setCurrency(c)
-    }
-  }, [])
+  const [currency, setCurrency] = useState<string>(geoData?.currency ?? 'UGX')
 
   if(loading){
     return <AdListSkelton/>
