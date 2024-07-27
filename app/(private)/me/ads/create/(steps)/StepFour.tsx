@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FormGroup } from '../fields'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
@@ -6,12 +6,20 @@ import { AdData } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ArrowBigLeft, ArrowBigRight } from 'lucide-react'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
+import MapView from '@/components/map/MapView'
+import dynamic from 'next/dynamic'
+import LoadingDots from '@/components/LoadingDots'
+import { DialogDescription } from '@radix-ui/react-dialog'
+import { useGeoData } from '@/lib/hooks'
 
 type Props = {}
 
 export default function StepFour({}: Props) {
+  const geoData = useGeoData()
   const router = useRouter()
   const [data, setData] = useState<AdData>()
+  const [lnglat, setLnglat] = useState(data?.location)
 
   useEffect(()=>{
     const item = localStorage.getItem("ad_data")
@@ -22,12 +30,28 @@ export default function StepFour({}: Props) {
     setData(JSON.parse(item))
   }, [])
 
+  const Map = useMemo(() => dynamic(
+    () => import('@/components/map/MapDialog'),
+    { 
+    loading: () => (
+        <div className="w-full border-2 h-[70vh] flex justify-center items-center">
+            <LoadingDots />
+        </div>
+    ),
+    ssr: false
+    }
+), [data])
+
   const getCurrentLocation = () => {
-    navigator.geolocation.getCurrentPosition((position)=>{
-      if(position.coords.latitude && position.coords.longitude){
-          setData({...data, location: `${position.coords.latitude},${position.coords.longitude}`})
-      }
-    })
+    if(!geoData?.location){
+      alert("No location data was found.")
+      return
+    }
+    setData({...data, location: `POINT(${geoData?.location?.lon} ${geoData?.location?.lat})`})
+  }
+
+  const setLocation = (lat: number, lon: number) => {
+    setLnglat(`POINT(${lon} ${lat})`)
   }
 
   const navigateToNextPage = () => {
@@ -49,10 +73,31 @@ export default function StepFour({}: Props) {
       </FormGroup>
       <FormGroup 
         label='Geo-Location' 
-        className='h-fit py-8 pt-10 flex flex-col gap-5 sm:flex-row px-5 sm:justify-between sm:items-center'
+        className='h-fit sm:h-fit py-8 px-8 pt-10 flex flex-col gap-5'
         tip='Provide the geo-location for your advert. This is useful for the buys to locate what they want.'>
+          {
+            data?.location &&
+            <p className="text-center text-lg text-primary">
+              Location: { data.location }
+            </p>
+          }
           <Button className='text-lg w-full rounded-sm bg-primary/10 hover:bg-primary/30 text-accent-foreground' onClick={ getCurrentLocation }>Use current Location</Button> 
-          <Button className='text-lg w-full rounded-sm bg-primary/10 hover:bg-primary/30 text-accent-foreground'>Select Location on Map</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className='text-lg w-full rounded-sm bg-primary/10 hover:bg-primary/30 text-accent-foreground'>Select Location on Map</Button>
+            </DialogTrigger>
+            <DialogContent className='w-full h-[60vh] flex flex-col gap-3 p-10 overflow-hidden'>
+              <Map setter={ setLocation }/>
+              <DialogFooter className='h-fit flex justify-between items-center'>
+                <DialogClose className='bg-destructive px-5 py-3 rounded-sm text-primary-foreground'>
+                  Cancle
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button onClick={ ()=>{ setData({...data, location: lnglat}) } }>Save Location</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
       </FormGroup>
 
       <div className="flex justify-between items-center py-3 max-w-lg mx-auto w-full">

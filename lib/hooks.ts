@@ -78,54 +78,76 @@ export const useSearchQuery = (query?: any, searchParams?: any) => {
  */
 export const useFetchAds = (cat?: string, subCat?: string) => {
   const searchParams = useSearchParams()
-  const [fetching, setFetching] = useState(false)
   const [ads, setAds] = useState<Ad[]>([])
+  const [loading, setLoading] = useState(false)
+  const geo = useGeoData()
   useEffect(()=>{
-    setFetching(true);
     (async()=>{
+      setLoading(true)
       const q = searchParams.get('qt') as string | undefined 
       const mxp = searchParams.get('mxp') as string | undefined
       const mnp = searchParams.get('mnp') as string | undefined
       const dist = searchParams.get('mxd') as string | undefined
       const ordb = searchParams.get('ordb') as string | undefined
-      let lat = 0.321, lon = 32.5714;
-
-      const geo_cookie = Cookies.get('geo')
-      if(geo_cookie){
-        console.log("Using saved Location")
-        const geoCookieObj = JSON.parse(geo_cookie)
-        lat = geoCookieObj.lat
-        lon = geoCookieObj.lon
-      }else{
-        console.log("Fetching new Location")
-        try {
-          const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
-          setLocation(res.data)
-          if(res.data){
-            lat = res.data.lat
-            lon = res.data.lon
-          }
-        } catch (error) {
-          console.log("An error ocured, using deault location.")
-        }
-      }
+      let lat = geo?.location?.lat!, lon = geo?.location?.lon!;
       
       const ads = await fetchNearbyAds(lat, lon, q, mxp, mnp, dist, ordb, cat, subCat)
       setAds(ads)
-      setFetching(false)
+      setLoading(false)
     })()
+  }, [searchParams, cat, subCat, geo])
 
-
-  }, [searchParams, cat, subCat])
-
-  return { ads, fetching }
+  return { ads, loading }
 }
 
 export const useGeoData = () => {
   const [geoData, setGeoData] = useState<GeoData>()
-  
   useEffect(()=>{
     const geo = Cookies.get('geo')
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        (result) => {
+          const { latitude, longitude, accuracy } = result.coords
+          const location = {lat: latitude, lon: longitude, accuracy}
+          if(geo){
+            console.log("Using save location")
+            const data = JSON.parse(geo)
+            setGeoData({...data, location })
+            return
+          }
+          (async()=>{
+            console.log("Fetching new Location")
+            try {
+              const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
+              const data = res.data
+              setGeoData({...data, location })
+            } catch (error) {
+              console.log("An error ocured while fetching your location, using deault location.")
+            }
+          })()
+          return
+        },
+        (error) => {
+          console.log(error.message)
+          if(geo){
+            console.log("Using save location")
+            setGeoData(JSON.parse(geo))
+            return
+          }
+          (async()=>{
+            console.log("Fetching new Location")
+            try {
+              const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
+              setGeoData(res.data)
+            } catch (error) {
+              console.log("An error ocured while fetching your location, using deault location.")
+            }
+          })()
+        }
+      )
+      return
+    }
+    console.log("Unsupported")
     if(geo){
       console.log("Using save location")
       setGeoData(JSON.parse(geo))

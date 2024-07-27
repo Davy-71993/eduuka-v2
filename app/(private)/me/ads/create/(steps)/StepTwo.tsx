@@ -19,7 +19,6 @@ export default function StepTwo({}: Props) {
   const [data, setData] = useState<AdData>()
   const [deatils, setDetails] = useState('')
   const [errors, setErrors] = useState<string>()
-  const [dailog, setDialog] = useState<string>()
   
   useEffect(()=>{
     const item = localStorage.getItem('ad_data')
@@ -42,11 +41,6 @@ export default function StepTwo({}: Props) {
     if(!description || description === '' || !name || name === ''){
        setErrors('Please fill all the required fields')
        return
-    }
-
-    if(!deatils){
-      setDialog('An ad without deatils may be daughted. A you sure you want to continue without details?')
-      return
     }
 
     const updatedData: AdData = {
@@ -76,7 +70,7 @@ export default function StepTwo({}: Props) {
         data?.sub_category?.extra_fields &&
         <RenderExtraFields
           setter={ (value) => { setDetails(value) } } 
-          fields={ data?.sub_category.extra_fields }
+          fields={ data?.sub_category.extra_fields ?? '' }
           initialData={ deatils } />
       } 
       <div className="flex justify-between items-center py-3 max-w-lg mx-auto w-full">

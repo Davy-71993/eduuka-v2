@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { AdData } from '@/lib/types'
+import { Ad, AdData } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ArrowBigLeft, ArrowBigRight, CloudUpload, Trash } from 'lucide-react'
@@ -9,6 +9,8 @@ import Image from 'next/image'
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
 import { createClient } from '@/lib/supabase/client'
 import { CDN_URL } from '@/lib/defaults'
+import { uploadAd } from '@/lib/actions/db_actions'
+import LoadingDots from '@/components/LoadingDots'
 
 type Props = {}
 
@@ -17,8 +19,9 @@ export default function StepFive({}: Props) {
   const router = useRouter()
 
   const [data, setData] = useState<AdData>()
-  const [error, setError] = useState<string>()
+  const [error, setError] = useState<string[]>([])
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>()
+  const [uploading, startUploading] = useTransition()
 
   useEffect(()=>{
     const item = localStorage.getItem("ad_data")
@@ -34,8 +37,8 @@ export default function StepFive({}: Props) {
   const validateData = () => {
     const files = data?.imageFiles
     !files || files.length < 2 
-      ? setError("You must upload at least two image files.")
-      : setError(undefined);
+      ? setError([...error, "You must upload at least two image files."])
+      : setError([]);
   }
 
   const convertImageToString = (file: File) => {
@@ -56,58 +59,60 @@ export default function StepFive({}: Props) {
     }
   }
 
-  const handleSubmit = async() => {
-    if(error){
-      console.log(`You have ${data?.imageFiles?.length} images.\n`, error)
-      return
-    }
+  const handleSubmit =() => {
+    startUploading(async()=>{
 
-    const ad = {
-      name: data?.name,
-      price: data?.price,
-      description: data?.description,
-      status: 'Draft',
-      sub_category_id: parseInt(`${data?.sub_category?.id}`),
-      location: data?.location,
-      pricing_scheme: data?.pricing_scheme,
-      min_price: data?.min_price,
-      max_price: data?.max_price,
-      address: data?.address,
-      pricing_period: data?.pricing_period,
-      ad_details: data?.ad_details 
-    }
-
-    const supabase = createClient()
-
-    const res = await supabase.from('ads').insert(ad).select('id').single()
-    if(res.error){
-      setError(res.error.message)
-      return
-    }
-
-    const { id } = res.data
-    data?.imageFiles?.forEach(async(image, index)=>{
-      const imageRes = await supabase.storage.from('ads').upload(`/${id}/${image.name}`, image)
-      if(imageRes.error){
-        setError(imageRes.error.message)
-        return
-      }
-
-      const metaDataRes = await supabase.from('ad_images').insert({
-        url: `${CDN_URL}/ads/${imageRes.data.path}`,
-        ad_id: id
-      })
-
-      console.log(metaDataRes)
-    })
+        if(error.length){
+          console.log(`You have ${data?.imageFiles?.length} images.\n`, error)
+          return
+        }
     
+        const ad: Ad = {
+          name: data?.name,
+          price: data?.price,
+          description: data?.description,
+          category_id: data?.category_id,
+          status: 'Draft',
+          default_currency: data?.default_currency,
+          sub_category_id: data?.sub_category?.id,
+          location: data?.location,
+          pricing_scheme: data?.pricing_scheme,
+          min_price: data?.min_price,
+          max_price: data?.max_price,
+          address: data?.address,
+          pricing_period: data?.pricing_period,
+          menu_items: data?.menu_items,
+          ad_details: data?.ad_details 
+        }
+    
+        const newAd = await uploadAd(ad)
+        if(!newAd){
+          setError([...error, "Sory, we could not upload your ad."])
+          return
+        }
+        const supabase = createClient()
+        const images = data?.imageFiles
+        images?.forEach(async(image, index) => {
+          const { data, error } = await supabase.storage.from('ads').upload(`/${newAd.id}/${image.name}`, image, {
+            upsert: true
+          })
+    
+          if(error){
+            console.log(`Image upload for image-${index} failed. `, error.message)
+            return
+          }
+          await supabase.from('ad_images').insert({url: `${CDN_URL}/ads/${data.path}`, ad_id: newAd.id })
+        })
+
+        localStorage.removeItem("ad_data")
+    })
   }
 
   return (
     <>
       {
         error &&
-        <p className="text-center w-fit mx-auto max-w-lg text-lg text-red-600">{ error}</p>
+        <p className="text-center w-fit mx-auto max-w-lg text-lg text-red-600">{ error.join(', ') }</p>
       }
       <div className="h-fit w-full static py-3">
         <div id='images-container' className="flex flex-wrap w-full p-3 gap-5 h-fit border-2 border-dashed border-primary rounded-sm">
@@ -155,8 +160,9 @@ export default function StepFive({}: Props) {
       <div className="flex justify-between items-center py-3 w-full">
         <Link href="?cp=4"><Button><ArrowBigLeft />Prevous Page</Button></Link>
         <Button 
+          disabled = { uploading }
           className='bg-green-600'
-          onClick={ handleSubmit }>Post Ad<ArrowBigRight /></Button>
+          onClick={ handleSubmit }>{ uploading ? <>Uploading <LoadingDots /></> : (<>Post Ad<ArrowBigRight /></>)}</Button>
       </div>
     </>
   )

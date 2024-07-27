@@ -12,20 +12,12 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Ad, Chat, Message } from '@/lib/types'
-import { useSearchParams } from 'next/navigation'
-import { Textarea } from '@/components/ui/textarea'
-import { ImageIcon, MailQuestion, SendHorizonal } from 'lucide-react'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { fetchMessages, getAdByID, getAdImage, getMessages, getUsername } from '@/lib/actions/db_actions'
+import { Ad, Message } from '@/lib/types'
+import { ImageIcon, MailQuestion } from 'lucide-react'
+import { fetchMessages, getAdByID } from '@/lib/actions/db_actions'
 import { createClient } from '@/lib/supabase/client'
 import { organizeMessages } from '@/lib/utils'
-import ImageWithFallbackUrl from '@/components/ImageWithFallbackUrl'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import LoadingDots from '@/components/LoadingDots'
 import ChatHeadImage from './(parts)/ChatHeadImage'
 import ConversationHead from './(parts)/ConversationHead'
 import ChatBoard from './(parts)/ChatBoard'

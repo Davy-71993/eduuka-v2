@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 
 export default function AdsList({ cat, subCat }: { cat?: string, subCat?: string }) {
   
-  const { ads, fetching } = useFetchAds(cat, subCat)
+  const { ads, loading } = useFetchAds(cat, subCat)
   
   const [currency, setCurrency] = useState<string>("USD")
 
@@ -21,7 +21,7 @@ export default function AdsList({ cat, subCat }: { cat?: string, subCat?: string
     }
   }, [])
 
-  if(fetching){
+  if(loading){
     return <AdListSkelton/>
   }
   

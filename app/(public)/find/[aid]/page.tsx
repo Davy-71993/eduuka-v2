@@ -101,7 +101,7 @@ export default async function page({ params, searchParams }: Props) {
         </div>
         <div className="w-full sm:w-[40%] xl:w-[50%] mt-5 h-fit sm:mt-0 xl:grid xl:gap-5 grid-cols-2">
           <PricePanel ad={ ad } />
-          <ProfileCard scheme={ ad.pricing_scheme } profile={ ad.profiles }  />
+          <ProfileCard ad_seller={ ad.seller_id } scheme={ ad.pricing_scheme } profile={ ad.profiles }  />
           <div className="col-span-2 hidden sm:block bg-secondary p-5 mt-5 xl:mt-0">
             <h1 className="text-center text-2xl">Tips to be safe from conmen</h1>
             <p className='py-1 list-disc text-lg list-item ml-5'>Avoid paying in advance, even for delivery</p>
