@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers"
 import { createClient } from "../supabase/server"
-import { Ad, AdImage, Category, Chat, MenuItem, Message, Profile, Store, SubCategory } from "../types"
+import { Ad, AdImage, Category, MenuItem, Message, Profile, Store, SubCategory } from "../types"
 import { numberOrUndefine } from "../utils"
 
 
@@ -15,7 +15,6 @@ export const getCategories =  async(fields='name, id, slug, image, ads(count), s
 
     return data as Category[]
 }
-
 
 export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, image, slug, ads(count))') => {
     const supabase = createClient(cookies())
@@ -140,16 +139,6 @@ export const createAdImage = async(image: AdImage) => {
 
 
 // Ads actions
-export const uploadAd = async(adData: Ad) => {
-    const supabase = createClient(cookies())
-
-    const { data, error } = await supabase.from('ads').insert(adData).select('id, name').single()
-    if(error){
-        console.log(error.message)
-        return null
-    }
-    return data as Ad
-}
 
 export const getUserAds = async() => {
     const supabase = createClient(cookies())
@@ -285,6 +274,25 @@ export const fetchMenuItems = async(ad_id: string) => {
         return []
     }
     return data as MenuItem[]
+}
+
+export const uploadAd = async(ad: Ad) => {
+    const { menu_items, ...restAd} = ad
+    const supabase = createClient(cookies())
+
+    const { data, error } = await supabase.from('ads').insert(restAd).select('id, name').single()
+    if(error){
+        console.log(error.message)
+        return null
+    }
+    if(menu_items?.length){
+        const menus = menu_items.map(i=>({item: i.item, price: i.price, ad_id: data.id }))
+        const menuRes = await supabase.from('menu_items').insert(menus)
+        if(menuRes.error){
+            console.log({menuResError: menuRes.error.message})
+        }
+    }
+    return data as Ad
 }
 
 

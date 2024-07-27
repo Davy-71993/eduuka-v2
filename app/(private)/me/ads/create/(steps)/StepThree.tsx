@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { FormGroup, FormRadioGroup } from '../fields'
+import { FormGroup, FormRadioGroup, FormSelect, MenuPriceItem, Tip } from '../fields'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowBigLeft, ArrowBigRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
-import { AdData } from '@/lib/types'
+import { AdData, MenuItem } from '@/lib/types'
+import { numberOrUndefine, toNumber } from '@/lib/utils'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { useGeoData } from '@/lib/hooks'
 
 type Props = {}
 
 export default function StepThree({}: Props) {
 
   const router = useRouter()
-  const priceOrUndefined = (price: string) => Number.isNaN(parseFloat(price)) ? undefined : parseFloat(price)
-  const priceOrZero = (price: number | undefined) => price ? price : 0
-
-  
+  const geoData = useGeoData()
   // Form data initially set by data from the localstrage
   const [data, setData] = useState<AdData>()
+  const [menuItem, setMenuItem] = useState<MenuItem>()
   
   // Get data from the localstarge and set the initial state
   useEffect(()=>{
@@ -26,9 +29,9 @@ export default function StepThree({}: Props) {
       router.push('/me/ads/create?cp=1&e=no saved data')
       return 
     }
-    setData(JSON.parse(item))
+    setData({...JSON.parse(item), default_currency: geoData?.currency })
     validatePrices()
-  }, [])
+  }, [geoData])
 
   // Run validations evrytime the price scheme changes
   useEffect(()=>{
@@ -41,11 +44,11 @@ export default function StepThree({}: Props) {
   // Just to make sure we always have a proper price.
   const validatePrices = ()=>{
     if(data?.pricing_scheme === "price range"){
-      priceOrZero(data?.min_price)  >=  priceOrZero(data?.max_price)
+      toNumber(data?.min_price)  >=  toNumber(data?.max_price)
        ?setError({priceRange: 'The min price should not be zero (0.0) but sould be less than the max price'}) 
        :setError({priceRange: undefined});
     }else if(data?.pricing_scheme === "fixed price" || data?.pricing_scheme === "periodic price"){
-      (!data?.price || priceOrZero(data?.price) === 0)
+      (!data?.price || toNumber(data?.price) === 0)
         ? setError({price: "You must provide a price greater than zero (0.0)"})
         : setError({price: undefined});
     }else{
@@ -67,14 +70,46 @@ export default function StepThree({}: Props) {
     router.push('?cp=4')
   }
 
+  const addMenuItem = () => {
+    if(menuItem?.item && menuItem.price){
+      setData({...data, menu_items: [...data?.menu_items??[], menuItem], price: undefined})
+    }
+  }
+
+  const removeMenuItem = (item: MenuItem) => {
+    setData({...data, menu_items: data?.menu_items?.filter((it) => it !== item)})
+  }
+
   return (
     <>
-      <FormGroup label='Set a Pricing Scheme' className='h-fit'>
-        <FormRadioGroup 
-          radios={[ "fixed price", "periodic price", "price range"]}
-          setter={ (e)=>{ setData({...data, pricing_scheme: e}) } }
-          value={ data?.pricing_scheme ?? '' }
-        />
+      <FormSelect label='Currency' 
+        options={[
+          {name: 'USD', value: 'USD'}, 
+          {name: 'UGX', value: 'UGX'}, 
+          {name: 'KSH', value: 'KSH'},
+          {name: 'TSH', value: 'TSH'}]}
+          setter={(e)=>{ setData({...data, default_currency: e })}}
+          value={data?.default_currency ?? 'UGX'}
+          required
+          tip='Select the currency for your billing. Whenever you change your currency, please double 
+          check your price to confirm that it is correct in accordance with the new currency you selected.' />
+      <FormGroup 
+        label='Set a Pricing Scheme' 
+        className='h-fit sm:h-fit p-5' 
+        tip='Select the most appropriate pricing scheme for your product or service'>
+        <RadioGroup 
+          value={ data?.pricing_scheme ?? '' } 
+          onValueChange={ (e)=>{ setData({...data, pricing_scheme: e})} } 
+          className='flex flex-col gap-4 h-fit px-8'>
+          {
+              [ "fixed price", "periodic price", "price range", "price menu"].map((radio, index) =>(
+                  <div key={index} className="flex items-center text-xl hover:text-primary transition-colors gap-4">
+                      <RadioGroupItem value={ radio } id={`r-${index}`} className='text-xl w-6 h-6'/>
+                      <Label htmlFor={`r-${index}`} className='capitalize text-xl'>{ radio }</Label>
+                  </div>
+              ))
+          }
+        </RadioGroup>
       </FormGroup>
 
       {/* Case pricing scheme is fixed. */}
@@ -93,8 +128,8 @@ export default function StepThree({}: Props) {
             type='number'
             autoFocus
             className='w-full bg-secondary h-12 text-lg px-8' 
-            value={ data.price?? '' } 
-            onChange={(e)=>{ setData({...data, price: priceOrUndefined(e.target.value)}) }}
+            value={ data.price ?? '' } 
+            onChange={(e)=>{ setData({...data, price: numberOrUndefine(e.target.value)}) }}
             placeholder='Price here' />
             
         </FormGroup>
@@ -119,14 +154,14 @@ export default function StepThree({}: Props) {
               value={ data.min_price?? '' } 
               autoFocus
               placeholder='Min Price'
-              onChange={(e)=>{ setData({...data, min_price: priceOrUndefined(e.target.value)}) }} />
+              onChange={(e)=>{ setData({...data, min_price: numberOrUndefine(e.target.value)}) }} />
             <h1>to</h1>
             <Input 
               type='number'
               className={`w-full px-4 bg-secondary border-2 ${ error?.priceRange && 'border-red-600'}`} 
               value={ data.max_price?? '' } 
               placeholder='Max Price'
-              onChange={(e)=>{ setData({...data, max_price: priceOrUndefined(e.target.value)}) }} />
+              onChange={(e)=>{ setData({...data, max_price: numberOrUndefine(e.target.value)}) }} />
           </div>
         </FormGroup>
       }
@@ -157,10 +192,66 @@ export default function StepThree({}: Props) {
                 autoFocus
                 className='w-full h-12 text-lg px-8 bg-secondary' 
                 value={ data.price ?? '' } 
-                onChange={(e)=>{ setData({...data, price: priceOrUndefined(e.target.value)}) }} />
+                onChange={(e)=>{ setData({...data, price: numberOrUndefine(e.target.value)}) }} />
             </FormGroup>
           }
         </>
+      }
+
+      {/* Case pricing scheme is price menu */}
+      {
+        data?.pricing_scheme === 'price menu' &&
+        <FormGroup 
+          label='Price Menu' 
+          className='p-5 h-fit sm:h-fit flex flex-col gap-3 items-center' 
+          tip='Add the menu items. Each menu item must have a price'>
+            {
+              data.menu_items?.length
+              ? data.menu_items?.map((item, index) => (
+                  <MenuPriceItem item={ item } key={ index } default_currency={ data.default_currency! } onclose={(e)=>{ removeMenuItem(e) }}  />
+                ))
+              : (
+                <div className="h-24 w-full flex justify-center items-center">
+                  <p className="text-muted-foreground text-center w-2/3">
+                  You {" don't "} have any menu items click the button bellow to add.
+                  </p>
+                </div>
+              )
+            }
+            <Dialog>
+              <DialogTrigger className='w-full max-w-60 bg-primary/40 hover:bg-primary/60 transition-colors mx-auto text-lg rounded-sm text-center py-2 px-5'>
+                Add Menu Item
+              </DialogTrigger>
+              <DialogContent className='p-5'>
+                <h1 className="text-xl text-muted-foreground text-center p-5">Create a menu item</h1>
+                <div className="w-full max-w-lg mx-auto mt-5 relative border-2 border-primary rounded-sm p-3">
+                    <Label className='px-3 absolute left-5 sm:text-lg -top-2 max-w-[70%] line-clamp-1 sm:-top-4 text-accent-foreground/50 bg-background'>
+                        Menu Item:
+                    </Label>
+                    <Input 
+                        className='text-lg' 
+                        value={ menuItem?.item ?? '' } 
+                        onChange={(e)=>{ setMenuItem({...menuItem, item: e.target.value}) }} />
+                    <Tip tip="Give a briefe description of the menu item" className='absolute -top-5 right-1 bg-background' />
+                </div>
+                <div className="w-full max-w-lg mx-auto mt-5 relative border-2 border-primary rounded-sm p-3">
+                    <Label className='px-3 absolute left-5 sm:text-lg -top-2 max-w-[70%] line-clamp-1 sm:-top-4 text-accent-foreground/50 bg-background'>
+                        Menu Price:
+                    </Label>
+                    <Input 
+                        className='text-lg' 
+                        type='number'
+                        value={ menuItem?.price ?? '' } 
+                        onChange={(e)=>{ setMenuItem({...menuItem, price: e.target.value}) }} />
+                    <Tip tip="Give a price to your item mentioned above" className='absolute -top-5 right-1 bg-background' />
+                </div>
+                <div className="max-w-lg mx-auto w-full flex justify-between items-center py-5">
+                  <DialogClose className='px-5 py-2 text-lg text-primary-foreground rounded-sm bg-destructive sm:min-w-60'>Cancle</DialogClose>
+                  <DialogClose onClick={ addMenuItem } className='px-5 py-2 text-lg text-primary-foreground rounded-sm bg-primary sm:min-w-60'>Save</DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
+        </FormGroup>
       }
 
       <div className="flex justify-between items-center py-3 max-w-lg mx-auto w-full">

@@ -1,19 +1,3 @@
-/**
- * The types definitions:
- * 1.   Profile,
- * 2.   Ad,
- * 3.   Category
- * 4.   SubCategory
- * 5.   AdImage
- * 6.   Address
- * 7.   AdLocation
- * 8.   Store
- * 9.   Notification
- * 10.  Chat
- * 11.  ChatMessage
- * 12.  ChatCall
- * 13.  Transuction 
- */
 
 export type Profile = {
     id?: string,
@@ -46,6 +30,7 @@ export type GeoData = {
     country: string,
     region: string,
     city: string,
+    location?: Location
     lat: number,
     lon: number,
     currency: string
@@ -61,29 +46,26 @@ export type SubCategory = {
     categories?: Category
 }
 
-export type AdPromotion = {
-    id?: number,
-    ad_id?: number,
-    start?: string,
-    end?: string
-}
 
 export type Ad = {
     id?: string,
     created_at?: string
     name?: string,
     price?: number,
+    price_menu?: Menu,
     seller_id?: string
     description?: string,
     status?: "Draft" | "Active" | "Sold" | "Deleted" | "Promoted",
     sub_category_id?: string,
-    category_id?: number,
-    store_id?: string,
+    category_id?: number
+    store_id?: string
     dist_meters?: number
     views?: number
-    trashed_at?: string,
-    ad_details?: string,
-    image?: string,
+    trashed_at?: string
+    ad_details?: string
+    lat?: string
+    long?: string
+    image?: string
     location?: string | any,
     pricing_scheme?: string, // "Fixed" | "Price Range" | "Periodic",
     min_price?: number,
@@ -91,9 +73,7 @@ export type Ad = {
     address?: string,
     deleted_at?: string,
     pricing_period?: string, // "Hourly" | "Weekly" | "Monthly" | "Quaterly" | "Yearly"
-    ad_ratings?: AdRating[],
-    sub_category?: SubCategory,
-    ad_promotions?: AdPromotion,
+    sub_category?: SubCategory
     ad_images?: AdImage[],
     profiles?: Profile,
     rating?: number,
@@ -103,25 +83,19 @@ export type Ad = {
 }
 
 export type MenuItem = {
-    item: string,
-    price: string 
+    item?: string,
+    price?: string 
 }
 
-export type AdLocation = {
+export type Menu = {
+    id?: string,
     ad_id?: string,
-    geo?: string
+    menu_items?: MenuItem[],
 }
 
 export interface AdData extends Ad {
     category?: Category,
     imageFiles?: File[]
-}
-
-export type AdRating = {
-    id?: string,
-    value?: number,
-    ad_id?: number,
-    client_id?: string
 }
 
 export type Message = {
@@ -137,21 +111,9 @@ export type AdImage = {
     ad_id?: string
 }
 export type Location = {
-    id: string
-    longitude: number,
-    latitude: number,
-    region?: string,
-    ad_id: string,
-    ad?: Ad
-}
-export type Transuction ={
-    amount: number
-    status: 'pending' | 'successful' | 'cancelled'
-    type: 'sale' | 'purchase'
-    client: Profile,
-    seller: Profile,
-    seller_id: string,
-    client_id: string
+    lon?: number,
+    lat?: number,
+    accuracy?: number
 }
 
 export type Store = {
@@ -169,40 +131,6 @@ export type Store = {
     slug?: string
 }
 
-export type Chat = {
-    id: string,
-    ad_name: string,
-    messages: ChatMessage[]
-}
-
-export type ChatMessage = {
-    id: string,
-    chat_id: string,
-    to: string,
-    from: string
-    type: "Text" | "AudioCall" | "VideoCall" | "File",
-    body: TextMessage | FileMessage
-}
-
-export type TextMessage = {
-    id: string,
-    message_id: string,
-    text: string
-}
-
-export type FileMessage = {
-    id: string,
-    message_id: string,
-    text?: string,
-    file_url: string
-}
-
-export type ChatFile = {
-    id: string,
-    chat_id: string,
-    type: 'Audio' | 'Video' | "Image",
-    url?: string
-}
 
 export type Notification = {
     id: string,
@@ -210,23 +138,4 @@ export type Notification = {
     message: string,
     created_at: string,
     status: "read" | "delivered" | "seen"
-}
-
-export type Address = {
-    id: string,
-    profile_id: string,
-    body: string
-}
-
-export type Feedback = {
-    id: string,
-    sender_id: string, // Relates to the profile
-    sender?: {
-        name: string
-    },
-    message: string,
-    ad_id: string // Relates to the ad
-    ad?: {
-        name: string
-    }
 }

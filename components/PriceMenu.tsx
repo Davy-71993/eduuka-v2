@@ -56,7 +56,7 @@ export default function PriceMenu({ ad_id, ad_currency, requested_currency }: Pr
                             <DropdownMenuItem key={ index }>
                                 <div className="flex gap-3">
                                     <p className="text-muted-foreground w-fit p-2">{ menu.item }</p>
-                                    <p className="text-muted-foreground w-fit p-2">{ displayCurrencyAndPrice(ad_currency, requested_currency, menu.price) }</p>
+                                    <p className="text-muted-foreground w-fit p-2">{ displayCurrencyAndPrice(ad_currency, requested_currency, `${menu.price}`) }</p>
                                 </div>
                             </DropdownMenuItem>
 

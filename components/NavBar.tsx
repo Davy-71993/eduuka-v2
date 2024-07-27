@@ -18,7 +18,7 @@ export default async function NavBar({}: Props) {
   const categories = await getCategories()
 
   return (
-    <div className='w-full bg-primary text-primary-foreground py-3 sm:py-5 drop-shadow-lg z-10 fixed top-0 right-0'>
+    <div className='w-full bg-primary text-primary-foreground py-3 sm:py-5 drop-shadow-lg z-[10000] fixed top-0 right-0'>
         <Container clasName="h-full">
             <div className="flex justify-between">
               <Link href={'/find'}>

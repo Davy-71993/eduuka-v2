@@ -26,7 +26,7 @@ export default function PricePanel({ ad }: Props) {
             ?
             <div className="flex flex-col gap-4">
                 <PriceTag className="px-6 pb-5" currency={ currency! } data={ad}/>
-               <ActionButtons phone={ ad.profiles?.phone } ad_seller={ ad.seller_id } />
+                <ActionButtons phone={ ad.profiles?.phone } ad_seller={ ad.seller_id } />
             </div>
             :
             <div className='flex flex-col w-full flex-1'>
@@ -35,7 +35,7 @@ export default function PricePanel({ ad }: Props) {
                     ad.menu_items?.map((menu, index)=>(
                         <div key={index} className='flex w-full transition-colors justify-between text-lg py-2 px-6 hover:bg-primary hover:text-primary-foreground'>
                             <span className=''>{ menu.item}</span>
-                            <span className=''>{ displayCurrencyAndPrice(ad.default_currency!, currency!, menu.price)}</span>
+                            <span className=''>{ displayCurrencyAndPrice(ad.default_currency!, currency!, menu.price!)}</span>
                         </div>
                     ))
                 }

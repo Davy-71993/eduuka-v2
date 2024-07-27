@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import LocationSelector from './LocationSelector'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { Search } from 'lucide-react'
+import { MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchQuery } from '@/lib/hooks'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -17,6 +17,8 @@ type Props = {
 export default function SearchBar({ includeLocation , toUrl }: Props) {
 
   const searchParams = useSearchParams()
+  const pathName = usePathname()
+
   const currentPath = usePathname()
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [qtObj, setQtObj] = useState<{qt?: string}>()
@@ -30,8 +32,10 @@ export default function SearchBar({ includeLocation , toUrl }: Props) {
   return (
     <div className='flex w-full max-w-[600px] border border-primary rounded-sm mx-auto bg-primary-foreground'>
       {
-        includeLocation &&
-        <LocationSelector className='hidden font-normal sm:flex bg-primary-foreground w-fit pr-0 text-primary hover:text-primary-foreground rounded-none rounded-l-sm text-sm sm:text-lg sm:h-full' />
+        pathName !== '/map' &&
+        <Link id='link' href="/map">
+          <Button className='rounded-none font-normal rounded-l-sm bg-primary-foreground text-primary hover:text-primary-foreground text-xs sm:text-lg p-2 sm:h-full'><MapPin /> <span className='ml-2'>View in Map</span></Button>
+        </Link>
       }
       <Input value={ searchTerm } type='text' 
         onKeyDownCapture={ (e) => {

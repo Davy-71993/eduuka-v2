@@ -2,13 +2,12 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Message } from "./types"
-import { getAdImage, getUsername } from "./actions/db_actions"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const toNumber = (str?: string) => Number.isNaN(parseInt(str??'')) ? 0  : parseInt(str??'')
+export const toNumber = (str?: string | number) => Number.isNaN(parseInt(str as string)) ? 0  : parseInt(str as string)
 
 export const numberOrUndefine = (str?: string) => Number.isNaN(parseInt(str??'')) ? undefined  : parseInt(str??'') 
 
@@ -41,16 +40,16 @@ export const displayCurrencyAndPrice = (ad_currency: string, currency: string, p
   // console.log(ad_currency, currency, price)
   const acceptedCurrencies = ["USD", "UGX", "KSH", "TSH"]
   if(ad_currency.toUpperCase() !in acceptedCurrencies) return "Unsupported currency"
-  if(currency === ad_currency) return `${currency.toUpperCase()} ${price}`
+  if(currency === ad_currency) return `${currency.toUpperCase()} ${toMoney(toNumber(price).toFixed(2))}`
   const exchangeRate: any = {
     "USD": 1,
     "UGX": 3720,
     "KSH": 124,
     "TSH": 2067
   }
-  if(ad_currency === "USD") return `${currency} ${toNumber(price)*exchangeRate[currency]}`
+  if(ad_currency === "USD") return `${currency} ${toMoney((toNumber(price)*exchangeRate[currency]).toFixed(2))}`
   
-  return `${currency} ${(toNumber(price)/exchangeRate[ad_currency])*exchangeRate[currency]}`
+  return `${currency} ${toMoney(((toNumber(price)/exchangeRate[ad_currency])*exchangeRate[currency]).toFixed(2))}`
 
 }
 
@@ -106,4 +105,39 @@ export const organizeMessages = async(messages: Message[], my_id: string) => {
     })
   }
   return imagefolders;
+}
+
+export const toMoney = (money: string) => {
+  const stringValue = money.toString()
+  if(!numberOrUndefine(money)){
+    return money
+  }
+
+  // 1. Eleiminate the decimal numbers
+  const int = stringValue.split('.')[0]
+
+  // Before the first comma
+  const rem = int.length%3
+  const bc = int.split('').splice(0, rem).join('')
+
+  // After the first comma
+  const div = int.split('').splice(rem, int.length).join('')
+
+  if(!div.length){
+    return money
+  }
+ 
+  // Start with a comma
+  let res = ''
+
+  if(bc.length){
+    res = ','
+  }
+  // Insert another comma after every three digits
+  let i = 3
+  while (i <= div.length ) {
+    res = res + div.slice(i-3, i)  + (i < div.length ? ',' : '')
+    i = i+3
+  }
+  return bc+res
 }

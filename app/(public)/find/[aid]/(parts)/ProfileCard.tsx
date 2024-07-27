@@ -5,10 +5,11 @@ import { Star } from 'lucide-react'
 
 type Props = {
     profile?: Profile,
-    scheme?: string
+    scheme?: string,
+    ad_seller?: string
 }
 
-export default function ProfileCard({ profile, scheme }: Props) {
+export default function ProfileCard({ profile, scheme, ad_seller }: Props) {
   return (
     <div className="bg-secondary mt-5 xl:mt-0 w-full p-5 h-fit">
         <div className="w-40 h-40 relative mx-auto rounded-full overflow-hidden border-2">
@@ -25,7 +26,7 @@ export default function ProfileCard({ profile, scheme }: Props) {
         </div>
         {
             scheme === "price menu" &&
-            <ActionButtons phone={ profile?.phone } ad_seller={ profile?.id} />
+            <ActionButtons phone={ profile?.phone } ad_seller={ ad_seller } />
         }
     </div>
   )
