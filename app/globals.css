@@ -62,3 +62,22 @@
     @apply ring-0 focus:ring-0 active:ring-0
   } */
 }
+
+.slide-in {
+  animation-name: slide;
+  animation-duration: .3s;
+  animation-delay: .1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slide {
+  from {
+    left: 70%;
+    opacity: 0;
+  }
+  to {
+    left:  100%;
+    opacity: 1;
+  }
+}

@@ -31,8 +31,6 @@ export type GeoData = {
     region: string,
     city: string,
     location?: Location
-    lat: number,
-    lon: number,
     currency: string
 }
 

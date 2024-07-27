@@ -118,51 +118,71 @@ export const useGeoData = () => {
           (async()=>{
             console.log("Fetching new Location")
             try {
-              const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
+              const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${location.lat}&lon=${location.lon}`)
               const data = res.data
-              setGeoData({...data, location })
+              const { address, display_name } = data
+              const locationData: GeoData = {
+                ...address,
+                address: display_name,
+                currency: "UGX",
+                location
+              }
+              setLocation(locationData)
+              setGeoData(locationData)
             } catch (error) {
-              console.log("An error ocured while fetching your location, using deault location.")
+              console.log("An error ocured while goe-reverse coding")
+              const data: GeoData = {
+                city: '',
+                country: '',
+                currency: 'UGX',
+                region: '',
+                location: {accuracy: 0, lat: 0, lon: 0}
+              }
+              setGeoData(data)
             }
           })()
           return
         },
         (error) => {
-          console.log(error.message)
+          console.log("Navigtor error: ", error.message)
           if(geo){
             console.log("Using save location")
             setGeoData(JSON.parse(geo))
             return
           }
-          (async()=>{
-            console.log("Fetching new Location")
-            try {
-              const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
-              setGeoData(res.data)
-            } catch (error) {
-              console.log("An error ocured while fetching your location, using deault location.")
-            }
-          })()
+          const data: GeoData = {
+            city: '',
+            country: '',
+            currency: 'UGX',
+            region: '',
+            location: {accuracy: 0, lat: 0, lon: 0}
+          }
+          setLocation(data)
+          setGeoData(data)
         }
       )
       return
     }
-    console.log("Unsupported")
+    console.log("Unsupported browser")
     if(geo){
       console.log("Using save location")
       setGeoData(JSON.parse(geo))
       return
     }
-    (async()=>{
-      console.log("Fetching new Location")
-      try {
-        const res = await axios.get('http://ip-api.com/json?fields=country,countryCode,currency,region,regionName,city,query,lat,lon')
-        setGeoData(res.data)
-      } catch (error) {
-        console.log("An error ocured while fetching your location, using deault location.")
-      }
-    })()
+    const data: GeoData = {
+      city: '',
+      country: '',
+      currency: 'UGX',
+      region: '',
+      location: {accuracy: 0, lat: 0, lon: 0}
+    }
+    setLocation(data)
+    setGeoData(data)
   }, [])
+
+  useEffect(()=>{
+    setLocation(geoData)
+  }, [geoData])
 
   return geoData
 }
