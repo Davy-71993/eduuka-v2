@@ -2,13 +2,12 @@
 import Container from '@/components/Container'
 import Link from 'next/link'
 import React from 'react'
-import { Location } from '../../../../components/Fiters'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import {  SubCategoryCard } from '@/components/CategoryCards'
 import SearchBar from '@/components/SearchBar'
-import AdsList from '@/components/AdsList'
 import { getCategoryByIDOrSlug } from '@/lib/actions/db_actions'
-import { HomeFiltersContainer } from '@/components/FilterContainers'
+import { HomeFiltersContainer } from '@/components/filtering/FilterContainers'
+import AdsList from '@/components/ads/AdsList'
 
 type Props = {
   params: any,
@@ -26,8 +25,6 @@ export default async function page({ params }: Props) {
       <div className="flex mt-5 sm:mt-10 sm:space-x-5">
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col space-y-5 mb-10">
           {/* Render the filter panel here. */}
-          <Location />
-          <h1 className="text-2xl">Extra filters.</h1>
           <HomeFiltersContainer />
         </div>
         <div className="w-full md:w-[80%] md:px-5 overflow-hidden">
@@ -51,7 +48,7 @@ export default async function page({ params }: Props) {
               { " > " + category?.name }
             </h1>
             {/* Render ads for specific category */}
-            <AdsList cat={ category.id } />
+            <AdsList c={category.id} />
             {/* Link to the find page */}
             <div className="w-full flex justify-end py-5">
               <Link href={'/find'} className="p-2 sm:p-3 bg-primary hover:bg-primary/80 transition-opacity rounded-sm text-primary-foreground font-bold text-sm sm:text-xl">Continue To All Ads {" >>"}</Link>

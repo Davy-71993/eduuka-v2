@@ -1,13 +1,12 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import LocationSelector from './LocationSelector'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useSearchQuery } from '@/lib/hooks'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { useSearch } from '@/lib/hooks'
 
 type Props = {
   includeLocation?: boolean,
@@ -15,9 +14,8 @@ type Props = {
 }
 
 export default function SearchBar({ includeLocation , toUrl }: Props) {
-
-  const searchParams = useSearchParams()
   const pathName = usePathname()
+  const searchParmas = useSearchParams()
 
   const currentPath = usePathname()
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -27,17 +25,21 @@ export default function SearchBar({ includeLocation , toUrl }: Props) {
     setQtObj({qt: searchTerm}) 
   }, [searchTerm])
 
-  const searchQuery = useSearchQuery(qtObj, searchParams)
+  useEffect(()=>{
+    setSearchTerm(searchParmas.get('qt') as string)
+  }, [searchParmas])
+
+  const searchQuery = useSearch(qtObj)
 
   return (
     <div className='flex w-full max-w-[600px] border border-primary rounded-sm mx-auto bg-primary-foreground'>
       {
         pathName !== '/map' &&
-        <Link id='link' href="/map">
+        <Link href="/map">
           <Button className='rounded-none font-normal rounded-l-sm bg-primary-foreground text-primary hover:text-primary-foreground text-xs sm:text-lg p-2 sm:h-full'><MapPin /> <span className='ml-2'>View in Map</span></Button>
         </Link>
       }
-      <Input value={ searchTerm } type='text' 
+      <Input value={ searchTerm ?? '' } type='text' 
         onKeyDownCapture={ (e) => {
           if(e.key === 'Enter'){
             document.getElementById('link')?.click()

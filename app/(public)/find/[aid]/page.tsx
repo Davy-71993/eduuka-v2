@@ -7,7 +7,7 @@ import Link from 'next/link'
 import React from 'react'
 import ProfileCard from './(parts)/ProfileCard'
 import ImageWithFallbackUrl from '@/components/ImageWithFallbackUrl'
-import SimilarAdsList from '@/components/SimilarAdsList'
+import SimilarAdsList from '@/components/ads/SimilarAdsList'
 import PricePanel from '@/components/PricePanel'
 
 type Props = {

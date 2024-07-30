@@ -34,7 +34,7 @@ export default function StepTwo({}: Props) {
       data.ad_details && setDetails(data.ad_details)
       // Find a way to set deatils with the data from the storage and pass it on to the renderer
 
-  }, [])
+  }, [router])
 
   const navigateToNextPage = () => {
    

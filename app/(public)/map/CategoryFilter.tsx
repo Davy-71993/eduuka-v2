@@ -1,9 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { useSearchQuery } from '@/lib/hooks'
+import { useSearch } from '@/lib/hooks'
 import { Category } from '@/lib/types'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
@@ -12,18 +10,16 @@ type Props = {
 }
 
 export default function CategoryFilter({ categories }: Props) {
-
-    const searchParams = useSearchParams()
     const router = useRouter()
     
     const [cateId, setCateId] = useState('')
     const [sCateId, setSCateId] = useState('')
     
-    const query = useSearchQuery({c: cateId, sc: sCateId}, searchParams)
+    const query = useSearch({cat: cateId, subCat: sCateId})
 
     useEffect(()=>{ 
         router.push(`/map${query}`)
-    }, [cateId, sCateId, query])
+    }, [query, router])
 
     return (
         <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary h-fit max-h-full rounded-sm">

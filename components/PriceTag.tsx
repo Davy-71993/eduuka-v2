@@ -1,11 +1,6 @@
-"use client"
-
 
 import { Ad } from '@/lib/types'
-import React, { useEffect, useState } from 'react'
 import PriceMenu from './PriceMenu'
-import { useSearchParams } from 'next/navigation'
-import Cookies from 'js-cookie'
 import { displayCurrencyAndPrice } from '@/lib/utils'
 
 type Props = {

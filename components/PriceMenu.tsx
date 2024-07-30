@@ -22,15 +22,14 @@ type Props = {
 }
 
 export default function PriceMenu({ ad_id, ad_currency, requested_currency }: Props) {
-    const [loading, startLoading] = useTransition()
-    const [items, setItems] = useState<MenuItem[]>([])
+    const [items, setItems] = useState<MenuItem[]>()
 
     useEffect(()=>{
-        if(!ad_id) return;
-        startLoading(async()=>{
+        (async()=>{
+            if(!ad_id) return;
             const menu_items = await fetchMenuItems(ad_id)
             setItems(menu_items)
-        })
+        })()
     }, [ad_id])
 
    
@@ -44,7 +43,7 @@ export default function PriceMenu({ ad_id, ad_currency, requested_currency }: Pr
         <DropdownMenuContent align="end">
             <DropdownMenuLabel>Prices</DropdownMenuLabel>
             {
-                loading
+                !items
                 ?
                 <Button className='w-full bg-transparent border-none'>
                     <LoadingDots />

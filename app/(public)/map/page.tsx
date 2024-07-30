@@ -1,7 +1,7 @@
 "use client"
 
 import Container from '@/components/Container'
-import { HomeFiltersContainer } from '@/components/FilterContainers'
+import { HomeFiltersContainer } from '@/components/filtering/FilterContainers'
 import LoadingDots from '@/components/LoadingDots'
 import SearchBar from '@/components/SearchBar'
 import { getCategories } from '@/lib/actions/db_actions'

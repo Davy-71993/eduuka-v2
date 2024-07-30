@@ -2,11 +2,10 @@
 import Container from '@/components/Container'
 import Link from 'next/link'
 import React from 'react'
-import { Location } from '@/components/Fiters'
 import SearchBar from '@/components/SearchBar'
-import AdsList from '@/components/AdsList'
 import { getSubCategory } from '@/lib/actions/db_actions'
-import { HomeFiltersContainer } from '@/components/FilterContainers'
+import { HomeFiltersContainer } from '@/components/filtering/FilterContainers'
+import AdsList from '@/components/ads/AdsList'
 
 type Props = {
   params: any
@@ -22,8 +21,7 @@ export default async function page({ params }: Props) {
       <SearchBar />
       <div className="flex mt-5 sm:mt-10 sm:space-x-5">
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col space-y-5 mb-10">
-          <Location />
-          <h1 className="text-2xl">Extra filters.</h1>
+          {/* Render filters */}
           <HomeFiltersContainer />
         </div>
         <div className="w-full md:w-[80%] md:px-5 overflow-hidden">
@@ -34,7 +32,7 @@ export default async function page({ params }: Props) {
               { " > " + subCategory?.name }</h1>
             
             {/* Render ads for a specific sub category. */}
-            <AdsList subCat={ subCategory.id } />
+            <AdsList sc={ subCategory.id } />
 
             {/* Link to the find page */}
             <div className="w-full flex justify-end py-5">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useTransition } from 'react'
+import React, { useCallback, useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Ad, AdData } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -30,16 +30,17 @@ export default function StepFive({}: Props) {
       return
     }
     setData(JSON.parse(item))
-  }, [])
+  }, [router])
 
-  useEffect(()=>{validateData()}, [data])
-
-  const validateData = () => {
+  
+  const validateData = useCallback(() => {
     const files = data?.imageFiles
     !files || files.length < 2 
-      ? setError([...error, "You must upload at least two image files."])
-      : setError([]);
-  }
+    ? setError([...error, "You must upload at least two image files."])
+    : setError([]);
+  }, [data?.imageFiles, error])
+
+  useEffect(()=>{validateData()}, [validateData, data])
 
   const convertImageToString = (file: File) => {
     const fileReader = new FileReader();

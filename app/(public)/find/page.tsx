@@ -1,8 +1,7 @@
-
-import AdsList from "@/components/AdsList"
+import AdsList from "@/components/ads/AdsList"
 import Container from "@/components/Container"
-import { HomeFiltersContainer } from "@/components/FilterContainers"
-import { DesktopCategories } from "@/components/Fiters"
+import { HomeFiltersContainer } from "@/components/filtering/FilterContainers"
+import { DesktopCategories } from "@/components/filtering/Filters"
 import SearchBar from "@/components/SearchBar"
 import StoreCard from "@/components/StoreCard"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
@@ -21,7 +20,6 @@ export default async function Home() {
         {/* Filters */}
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col gap-5 mb-10">
           <DesktopCategories categories={ categories } />
-          <h1 className="text-2xl">Extra filters.</h1>
           <HomeFiltersContainer />
         </div>
         

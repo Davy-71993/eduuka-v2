@@ -13,7 +13,7 @@ export default function SlideToLeft({ title, children, className }: Props) {
     const [hidden, setHidden] = useState('hidden')
     return (
         <div onMouseEnter={()=>{ setHidden('') }} onMouseLeave={()=>{ setHidden('hidden') }} className="relative w-full">
-            <div className={`px-5 py-3 min-w-60 transition-colors flex justify-between text-muted text-lg w-full items-center ${ !hidden && 'bg-blue-500'} border-b border-muted bg-blue-400 ${ className }`}>
+            <div className={`px-5 py-3 min-w-60 transition-colors flex justify-between text-muted text-lg w-full items-center cursor-pointer ${ !hidden && 'bg-primary/95'} bg-primary ${ className }`}>
                 <p className='line-clamp-1'>{ title }</p>
                 {
                     !hidden &&
