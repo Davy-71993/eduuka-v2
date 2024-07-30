@@ -23,7 +23,7 @@ export default function ConversationHead({ id, onClick }: Props) {
             setUrl(data.image)
             setName(data.username)
         })()
-    }, [id])
+    }, [id, supabase])
   return (
     <div className="flex pl-5 gap-3 items-center cursor-pointer hover:bg-muted-foreground/50 hover:text-muted text-muted-foreground" onClick={ onClick }>
         <div className="w-10 h-10 rounded-full overflow-hidden">

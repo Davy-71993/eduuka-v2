@@ -35,7 +35,7 @@ export default function StepOne({ categories }: Props) {
     useEffect(()=>{
         const category = categories.find(cat => cat.id === categoryValue)
         setCategory(category)
-    }, [ categoryValue ])
+    }, [ categoryValue, categories ])
 
     useEffect(()=>{
         if(!category){

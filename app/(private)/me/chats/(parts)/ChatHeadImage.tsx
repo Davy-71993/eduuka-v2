@@ -22,7 +22,7 @@ export default function ChatHeadImage({ id }: Props) {
             setUrl(data.image)
             setName(data.name)
         })()
-    }, [])
+    }, [supabase, id])
   return (
     <div className="flex gap-3 items-center">
         <div className="w-16 h-16">

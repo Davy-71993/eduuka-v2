@@ -5,19 +5,16 @@ import { MapContainer, TileLayer } from "react-leaflet"
 import MarkerList from "./MarkerList"
 import { useEffect, useState } from "react"
 import LoadingDots from "../LoadingDots"
-import { useFetchAds, useGeoData } from "@/lib/hooks"
+import { useAds, useGeoData } from "@/lib/hooks"
 import Link from "next/link"
 import { Location } from "@/lib/types"
-import { useSearchParams } from "next/navigation"
-
 
 export default function MapView() {
-    const searchParams = useSearchParams()
 
     const [center, setCenter] = useState<Location | null>(null)
-
-    const { ads } = useFetchAds(searchParams.get('c') as string, searchParams.get('sc') as string)
+    const { ads } = useAds()
     const geoData = useGeoData()
+
     useEffect(()=>{
         if(geoData){
             setCenter({lat: geoData.location?.lat!, lon: geoData.location?.lon!, accuracy: geoData.location?.accuracy!})
@@ -42,7 +39,10 @@ export default function MapView() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <MarkerList ads={ ads } center={ center } />
+            {
+                ads &&
+                <MarkerList ads={ ads } center={ center } />
+            }
         </MapContainer>
     </div>
   )

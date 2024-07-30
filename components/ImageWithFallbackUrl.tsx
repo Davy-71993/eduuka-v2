@@ -19,6 +19,7 @@ export default function ImageWithFallbackUrl({ src, className, alt }: Props) {
   return (
     <div className="relative w-full h-full">
       <Image 
+        priority
         onError={ (e)=>{ 
           setImageUrlError(true)
         }}
@@ -26,6 +27,7 @@ export default function ImageWithFallbackUrl({ src, className, alt }: Props) {
         alt={alt ?? 'Image' } 
         fill
         className={ className }
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />
     </div>
   )

@@ -5,6 +5,7 @@ import axios from "axios";
 import { fetchNearbyAds } from "./actions/db_actions";
 import { Ad, GeoData } from "./types";
 import { setLocation } from "./actions/business_actions";
+import { SUPPORTED_CURRANCIES } from "./defaults";
 
 /**
  * A function that generates the query string depending on the desired filters and
@@ -15,21 +16,10 @@ import { setLocation } from "./actions/business_actions";
  * @param searchParams The searhParams form next/navigation. 
  * @returns A prepared query string depending on the requested filters and the exiting searchParams 
  */
-export const useSearchQuery = (query?: any, searchParams?: any) => {
+export const useSearch = (query?: any) => {
   // Initiate the queryString.
   const [queryString, setQuryString] = useState('')
-  // let obj: any = {}
-
-  const obj = useMemo(()=>{
-    let b:any = {}
-      // Creat an interable object from the search params.
-      for (const [key, value] of searchParams) {
-          b = {...b, [key]: value}
-      }
-
-      return b
-
-  }, [searchParams])
+  let obj = useFilters()
 
 
   // For every time the query is changed
@@ -76,26 +66,27 @@ export const useSearchQuery = (query?: any, searchParams?: any) => {
  *               sub-category ads
  * @returns Loading state or ads list.
  */
-export const useFetchAds = (cat?: string, subCat?: string) => {
-  const searchParams = useSearchParams()
-  const [ads, setAds] = useState<Ad[]>([])
-  const [loading, setLoading] = useState(false)
+export const useAds = (cat?: string, subCat?: string) => {
   const geo = useGeoData()
+  const filters = useFilters()
+
+  const [ads, setAds] = useState<Ad[]>()
+  const [loading, startLoading] = useTransition()
+
   useEffect(()=>{
-    (async()=>{
-      setLoading(true)
-      const q = searchParams.get('qt') as string | undefined 
-      const mxp = searchParams.get('mxp') as string | undefined
-      const mnp = searchParams.get('mnp') as string | undefined
-      const dist = searchParams.get('mxd') as string | undefined
-      const ordb = searchParams.get('ordb') as string | undefined
-      let lat = geo?.location?.lat!, lon = geo?.location?.lon!;
-      
-      const ads = await fetchNearbyAds(lat, lon, q, mxp, mnp, dist, ordb, cat, subCat)
+    startLoading(async()=>{
+      if(!geo) return
+      let filterBody = filters
+      if(cat){
+        filterBody = { ...filterBody, cat }
+      }
+      if(subCat){
+        filterBody = { ...filterBody, subCat}
+      }
+      const ads = await fetchNearbyAds(geo?.location?.lat, geo?.location?.lon, filterBody)
       setAds(ads)
-      setLoading(false)
-    })()
-  }, [searchParams, cat, subCat, geo])
+    })
+  }, [cat, subCat, geo, filters])
 
   return { ads, loading }
 }
@@ -112,7 +103,7 @@ export const useGeoData = () => {
           if(geo){
             console.log("Using save location")
             const data = JSON.parse(geo)
-            setGeoData({...data, location })
+            setGeoData({...data, location})
             return
           }
           (async()=>{
@@ -124,10 +115,9 @@ export const useGeoData = () => {
               const locationData: GeoData = {
                 ...address,
                 address: display_name,
-                currency: "UGX",
+                currency: SUPPORTED_CURRANCIES[address.country_code] ?? 'UGX',
                 location
               }
-              setLocation(locationData)
               setGeoData(locationData)
             } catch (error) {
               console.log("An error ocured while goe-reverse coding")
@@ -147,6 +137,8 @@ export const useGeoData = () => {
           console.log("Navigtor error: ", error.message)
           if(geo){
             console.log("Using save location")
+            // To-do
+            // Later use this geo.location lat and lon to fetch the details from openstreatmap. 
             setGeoData(JSON.parse(geo))
             return
           }
@@ -157,7 +149,6 @@ export const useGeoData = () => {
             region: '',
             location: {accuracy: 0, lat: 0, lon: 0}
           }
-          setLocation(data)
           setGeoData(data)
         }
       )
@@ -176,7 +167,6 @@ export const useGeoData = () => {
       region: '',
       location: {accuracy: 0, lat: 0, lon: 0}
     }
-    setLocation(data)
     setGeoData(data)
   }, [])
 
@@ -185,4 +175,16 @@ export const useGeoData = () => {
   }, [geoData])
 
   return geoData
+}
+
+export const useFilters = () => {
+  const searchParams: any = useSearchParams()
+  return useMemo(()=>{
+    let b:any = {}
+      // Creat an interable object from the search params.
+      for (const [key, value] of searchParams) {
+          b = {...b, [key]: value}
+      }
+      return b
+  }, [searchParams])
 }

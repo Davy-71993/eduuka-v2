@@ -20,7 +20,7 @@ export default function MapDialog({ setter }: { setter: (lat: number, lon: numbe
                 accuracy: result.coords.accuracy
             })
         })
-    }, [navigator.geolocation])
+    }, [])
     if(!center){
         return (
             <div className="w-full h-full border-2 flex justify-center items-center">
@@ -62,7 +62,7 @@ const LocationMarker = ({ lat, lon, setter }:{lat: number, lon: number, setter: 
     useEffect(()=>{
         setter(position.lat, position.lon)
         map.flyTo([position.lat, position.lon], map.getZoom())
-    }, [position])
+    }, [position, map, setter])
     return (
         <Marker 
             draggable

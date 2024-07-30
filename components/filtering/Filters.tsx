@@ -1,20 +1,23 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
 import { Category, SubCategory } from "@/lib/types"
 import { AccordionTrigger } from "@radix-ui/react-accordion"
-import { Check, ChevronDown, Star } from "lucide-react"
-import LocationSelector from "@/components/LocationSelector"
-import { ScrollArea } from "./ui/scroll-area"
+import { Check, ChevronDown, CircleAlert, Star } from "lucide-react"
 import Link from "next/link"
 import { NavigationMenuLink } from "@radix-ui/react-navigation-menu"
-import { Button } from "./ui/button"
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { Label } from "./ui/label"
 import { toNumber } from "@/lib/utils"
-import SlideToLeft from "./animated/SlideToLeft"
+import { Button } from "../ui/button"
+import { ScrollArea } from "../ui/scroll-area"
+import SlideToLeft from "../animated/SlideToLeft"
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
+import { Label } from "../ui/label"
+import { FormGroup } from "@/app/(private)/me/ads/create/fields"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { useSearch } from "@/lib/hooks"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 
 export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}) =>(
@@ -32,40 +35,88 @@ export const SubCategories = ({ subCategories }: { subCategories: SubCategory[]}
     </Accordion>
 )
 
-export const PriceRange = ({ setter, error }: { setter?: (range?: {min?: string, max?: string}) => void, error?: string }) => {
-    const [ range, setRange ] = useState<{min?: string, max?: string}>()
-    useEffect(()=>{ setter && setter(range)}, [range])
+export const PriceRange = () => {
+
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
+
+    const [ range, setRange ] = useState<{mnp?: string, mxp?: string}>()
+    const [error, setError] = useState<string>()
+
+    const queryString = useSearch(range)
+
+    useEffect(()=>{
+        const mnp = searchParams.get('mnp') as string | undefined
+        const mxp = searchParams.get('mxp') as string | undefined
+
+        const oldrange = { mnp, mxp }
+        setRange(oldrange)
+    }, [searchParams])
+
+    const filterByRange = () => {
+        if(error){
+            return
+        }
+        router.push(`${pathname}${queryString}`)
+    }
     return (
         <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
             <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
                 <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Price Range</span><ChevronDown/></AccordionTrigger>
                 <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center'>
                     {
-                        error &&
-                        <p className="text-red-500">{ error }</p>
+                        error && 
+                        <p className=" text-destructive">{error}</p>
                     }
                     <Input 
                         placeholder="Min" 
                         type="number"
-                        value={ range?.min ?? '' } 
-                        onChange={ (e) => { setRange({...range, min: e.target.value})} }
-                        className="px-2 h-fit py-2"/>
-                    <p>-to-</p> 
+                        value={ range?.mnp ?? '' } 
+                        onChange={ (e) => { 
+                            const value = e.target.value
+                            if(range?.mxp && toNumber(value) > toNumber(range?.mxp)){
+                                setError("The min price can not be greater than the max price")
+                            }else{
+                                setError(undefined)
+                            }
+                            setRange({...range, mnp: value})
+                        } }
+                        onKeyDownCapture={(e)=>{
+                            if(e.key === "Enter"){
+                                filterByRange()
+                            }
+                        }}
+                        className="px-2 h-fit py-3 w-full text-lg"/>
+                    <p className="px-2 h-fit py-3 w-full text-lg">to</p> 
                     <Input 
                         placeholder="Max" 
                         type="number"
-                        className="px-2 h-fit py-2"
-                        onChange={ (e) => { setRange({...range, max: e.target.value})} }
-                        value={ range?.max ?? '' } />
+                        className="px-2 h-fit py-3 w-full text-lg"
+                        onChange={ (e) => { 
+                            const value = e.target.value
+                            if(range?.mnp && toNumber(value) < toNumber(range?.mnp)){
+                                setError("The max price can not be less than the min price")
+                            }else{
+                                setError(undefined)
+                            }
+                            setRange({...range, mnp: value})
+                            setRange({...range, mxp: e.target.value})
+                        }}
+                        onKeyDownCapture={(e)=>{
+                            if(e.key === "Enter"){
+                                filterByRange()
+                            }
+                        }}
+                        value={ range?.mxp ?? '' } />
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
     )
 }
 
-export const Rating = ({ setter }: { setter?: (val?: number)=> void }) => {
+export const Rating = () => {
     const [minRating, setMinRating] = useState<number>()
-    useEffect(()=>{ setter && setter(minRating)}, [minRating])
     return (
         <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
             <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
@@ -135,7 +186,6 @@ export const Location = () =>{
                     <div className="flex justify-between items-center p-2">
                         <span>Location</span>
                     </div>
-                    <LocationSelector />
                 </div>
             </div>
         </div>
@@ -166,13 +216,13 @@ export const MobileCategories = ({categories}:{ categories: Category[]}) => (
                                         ))
                                     }
                                     <NavigationMenuLink>
-                                        <Link className="w-full hover:text-blue-500 p-2 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href={`/categories/${cat.slug}`}>All { cat.name }</Link>
+                                        <Link className="w-full hover:text-prbg-primary/95hover:bg-primary/95 p-2 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href={`/categories/${cat.slug}`}>All { cat.name }</Link>
                                     </NavigationMenuLink>
                                 </AccordionContent>
                             </AccordionItem>
                         ))}
                         <NavigationMenuLink>
-                            <Link className="w-full hover:text-blue-500 text-xl py-2 px-5 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href="/categories">All Categories</Link>
+                            <Link className="w-full hover:text-prbg-primary/95hover:bg-primary/95 text-xl py-2 px-5 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href="/categories">All Categories</Link>
                         </NavigationMenuLink>
                     </Accordion>
                 </ScrollArea>
@@ -183,17 +233,17 @@ export const MobileCategories = ({categories}:{ categories: Category[]}) => (
 
 export const DesktopCategories = ({categories}:{ categories: Category[]}) => (
     <div className="rounded-sm w-full">
-        <Link href={'/categories'} className="px-5 py-3 bg-blue-400 hover:bg-blue-500 text-muted rounded-t-sm w-full block border-b text-lg">See all Categories</Link>
+        <Link href={'/categories'} className="px-5 rounded-t-sm py-3 bg-primary hover:bg-primary/95 text-muted w-full block border-b text-lg">See all Categories</Link>
         {
             categories.map((cate, index) => (
                 <SlideToLeft key={ index } title={ cate.name } className={index === categories.length-1 ? 'rounded-b-sm' : ''}>
                     {
                         (cate.sub_categories??[]).length  > 0 &&
-                        <div className="w-full max-w-60 rounded-sm z-50">
-                            <Link href={`/categories/${cate.slug}`} className="px-5 py-3 bg-blue-400 hover:bg-blue-500 text-muted rounded-t-sm w-full block border-b text-lg">See all in { cate.name}</Link>
+                        <div className="w-full max-w-60 rounded-sm z-50 bg-background">
+                            <Link href={`/categories/${cate.slug}`} className="px-5 py-3 bg-primary hover:bg-primary/95 text-muted rounded-t-sm w-full block border-b text-lg">See all in { cate.name}</Link>
                             {
                                 cate.sub_categories?.map((scate, ind)=>(
-                                    <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } className={`bg-blue-400 border-b border-muted text-muted px-5 block w-full py-2 min-w-60 hover:bg-blue-500 ${ ind === (cate.sub_categories??[]).length-1 ? 'rounded-b-sm' : ''}`}>{ scate.name }</Link>
+                                    <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } className={`bg-primary text-muted px-5 block w-full py-2 min-w-60 hover:bg-primary/95 ${ ind === (cate.sub_categories??[]).length-1 ? 'rounded-b-sm' : ''}`}>{ scate.name }</Link>
                                 ))
                             }
                         </div>
@@ -205,20 +255,32 @@ export const DesktopCategories = ({categories}:{ categories: Category[]}) => (
    
 )
 
-export const OrderBy = ({ setter }: { setter: (val: string)=> void }) => {
-    const [val, setVal] = useState('dist_meters')
-    const handleSetter = (e: string) => {
-        setVal(e)
-    }
+export const OrderBy = () => {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
+    
+    const [val, setVal] = useState<string>()
+    const queryString = useSearch({ordby: val})
+    
     useEffect(()=>{
-        setter(val)
-    }, [val])
+        router.push(`${pathname}${queryString}`)
+    }, [queryString, pathname, router])
+
+    useEffect(()=>{
+        const value = searchParams.get('ordby')
+        if(!value){
+            setVal(undefined)
+            return
+        }
+        setVal(value)
+    }, [searchParams])
     return (
         <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
             <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
                 <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Order By</span><ChevronDown/></AccordionTrigger>
                 <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center w-full'>
-                    <RadioGroup value={ val } onValueChange={(e)=>{ handleSetter(e) }} className='flex flex-col gap-5 w-full h-fit px-8'>
+                    <RadioGroup value={ val } onValueChange={(e)=>{ setVal(e) }} className='flex flex-col gap-5 w-full h-fit px-8'>
                         <div className="flex items-center space-x-2 text-xl w-full">
                             <RadioGroupItem value="dist_meters" id={`r-dist_meters`} />
                             <Label htmlFor={`r-dist_meters`} className=" text-xl">Distance</Label>
@@ -234,34 +296,134 @@ export const OrderBy = ({ setter }: { setter: (val: string)=> void }) => {
     )
 }
 
-export const Distance = ({ setter }: { setter: (e?: string)=> void }) => {
+export const Distance = () => {
     const [val, setVal] = useState<string>()
-    const [error, setError] = useState(false);
-    
-    useEffect(()=>{  
-        if(toNumber(val) >= 500){
-            setError(false)
-            setter(val)
-            return
+    const [units, setUnits] = useState<"Meters" | "Kilometers" | "Miles">("Meters")
+    const [error, setError] = useState<string>()
+
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
+
+    useEffect(()=>{
+        const u = localStorage.getItem('units')
+        setUnits(u ? u as "Meters" | "Kilometers" | "Miles" : "Meters")
+    }, [])
+
+    const fromMeters = useMemo(() => {
+        const value = searchParams.get('dist')
+        if(!value){
+            return undefined
         }
-        setError(true)
-        setVal(undefined)
-        setter(undefined)
-    }, [val])
+
+        switch (units) {
+            case "Kilometers":
+                return (toNumber(value)/1000).toString()
+
+            case "Miles":
+                return (toNumber(value)/1600).toString()
+        
+            default:
+                return value;
+        }
+        
+    }, [searchParams, units])
+    
+    useEffect(()=>{ 
+        setVal(fromMeters)
+    }, [fromMeters])
+    
+    const toMeters = (v: number, u: "Meters" | "Kilometers" | "Miles") => {
+        switch (u) {
+            case 'Meters':
+            return v;
+        case 'Kilometers':
+            return v*1000;
+        case 'Miles':
+            return v*1600;
+        default:
+            return v;
+        }
+    }
+    
+    const queryString = useSearch({dist: toMeters(toNumber(val), units)})
+                    
+    useEffect(()=>{
+        if(error && toMeters(toNumber(val), units) >= 500){
+            setError(undefined)
+        }
+    }, [val, units, error])
+        
+    const filterbyDistance = () => {
+        if(!val || val.trim().length === 0){
+            setError(`Please enter valid distance in ${units}`)
+            return router.push(`${pathname}${queryString}`)
+        }
+        let numMeters = toMeters(toNumber(val), units)
+        if(numMeters < 500){
+            switch (units) {
+                case "Kilometers":
+                    setError("The distnace in Kilometers must be at least 0.5Km")
+                    break;
+                case "Meters":
+                    setError("The distnace in Meters must be at least 500M")
+                    break;
+                case "Miles":
+                    setError("The distnace in Miles must be at least 0.5miles")
+                    break;
+                default:
+                    setError("Unkown units");
+            }
+            return router.push(`${pathname}${queryString}`)
+        }
+        router.push(`${pathname}${queryString}`)
+        
+    }
+    
     return (
         <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary rounded-sm">
             <AccordionItem value="Sub-Categories" className='w-full border-none border-t px-2'>
                 <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm"><span>Max Distance</span><ChevronDown/></AccordionTrigger>
                 <AccordionContent className='flex flex-col space-y-2 py-3 px-1 items-center w-full'>
-                    <p className="text-lg text-muted-foreground px-3">
-                        Please enter the distance in meters only.
-                    </p>
-                    <Input 
-                        type="number" 
-                        value={ val }
-                        onChange={ (e)=>{setVal(e.target.value)} }
-                        placeholder="Enter the distance here" 
-                        className={`w-full border text-xl ${ error && 'border-red-500'}`} />
+                    <FormGroup label={`Distance in ${units}`} className="h-fit sm:h-fit p-5">
+                        {
+                            error &&
+                            <p className=" text-destructive flex gap-3 items-start justify-start py-2">
+                                <CircleAlert />
+                                <span className="self-center">{ error }</span>
+                            </p>
+                        }
+                        <div className={`w-full flex text-xl ${ error && 'border-red-500'}`}>
+                            <Select onValueChange={(u)=>{
+                                    setUnits(u as "Meters" | "Kilometers" | "Miles")
+                                    localStorage.setItem('units', u)
+                                }}>
+                                <SelectTrigger className="w-full rounded-none border-none text-lg">
+                                    <SelectValue placeholder={units}/>
+                                </SelectTrigger>
+                                <SelectContent className="w-full">
+                                    <SelectItem value="Meters" >Meters</SelectItem>
+                                    <SelectItem value="Kilometers" >Kilometers</SelectItem>
+                                    <SelectItem value="Miles" >Miles</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Input 
+                                type="number" 
+                                value={ val ?? ''}
+                                onChange={ (e)=>{
+                                    const value= e.target.value
+                                    setVal(value)
+                                } }
+                                onKeyDownCapture={ (e) => {
+                                    if(e.key === "Enter"){
+                                        filterbyDistance()
+                                    }
+                                }}
+                                placeholder="Distance here" 
+                                autoFocus
+                                className={`w-full rounded-none text-lg px-2`} />
+                        </div>
+                    </FormGroup>
                 </AccordionContent>
             </AccordionItem>
         </Accordion>

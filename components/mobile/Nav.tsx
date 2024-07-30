@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Home, LogOut, Menu, Plus, User } from 'lucide-react'
 import { 
     NavigationMenu, 
@@ -12,36 +12,38 @@ import {
 } from '../ui/navigation-menu'
 import Link from 'next/link'
 import { Button } from '../ui/button'
-import { MobileCategories, Location, PriceRange, Rating } from '../Fiters'
 import { usePathname } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
 import { MobileLinkItem } from '@/app/(private)/me/LinkItem'
 import { ScrollArea } from '../ui/scroll-area'
-import { createClient } from '@/lib/supabase/client'
 import { Category } from '@/lib/types'
-import axios from 'axios'
-import { setLocation } from '@/lib/actions/business_actions'
-import Cookies from 'js-cookie'
+import { AppContext } from '@/context/Appcontext'
+import { Location, MobileCategories, PriceRange, Rating } from '../filtering/Filters'
 
 type Props = {
-    authenticated: boolean,
-    userData?: any,
     categories: Category[]
 }
 
-export default function Nav({ authenticated, categories }: Props) {
+export default function Nav({ categories }: Props) {
 
     const pathname = usePathname()
-    const supabase =  createClient()
+    const { supabase, me, setState } = useContext(AppContext)
+    const [authenticated, setAuthenticated] = useState<boolean>(false)
+
+    useEffect(()=>{
+        setAuthenticated(!!me)
+    }, [me])
 
     const logout = async() => {
-        const { error } = await supabase.auth.signOut()
-        
-        
-        if(!error){
-            location.reload()
+        if(!supabase){
+            console.log("No supabase client initiated")
+            return
         }
-
+        const { error } = await supabase.auth.signOut()
+        if(!error){
+            setState({key: 'me', value: null})
+            return
+        }
         console.log(error)
     }
 

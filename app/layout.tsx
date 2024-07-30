@@ -5,8 +5,9 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/providers/theme-provider";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import Chat from "@/components/Chat";
+import Chat from "@/components/chat/Chat";
 import { Suspense } from "react";
+import WithContext from "@/context/WithContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", });
 
@@ -37,15 +38,14 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           > */}
-            
-            <NavBar />
-            <div className="pt-[4.5rem] sm:pt-24 relative pb-10 min-h-screen">
-              {children}
-              <Suspense fallback={ "Loading..." }>
+            <WithContext>
+              <NavBar />
+              <div className="pt-[4.5rem] sm:pt-24 relative pb-10 min-h-screen">
+                {children}
                 <Chat />
-              </Suspense>
-            </div>
-            <Footer />
+              </div>
+              <Footer />
+            </WithContext>
           {/* </ThemeProvider> */}
       </body>
     </html>

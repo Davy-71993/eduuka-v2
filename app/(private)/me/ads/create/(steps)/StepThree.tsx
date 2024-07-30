@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FormGroup, FormRadioGroup, FormSelect, MenuPriceItem, Tip } from '../fields'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -21,28 +21,9 @@ export default function StepThree({}: Props) {
   // Form data initially set by data from the localstrage
   const [data, setData] = useState<AdData>()
   const [menuItem, setMenuItem] = useState<MenuItem>()
-  
-  // Get data from the localstarge and set the initial state
-  useEffect(()=>{
-    const item = localStorage.getItem('ad_data')
-    if(!item){
-      router.push('/me/ads/create?cp=1&e=no saved data')
-      return 
-    }
-    setData({...JSON.parse(item), default_currency: geoData?.currency })
-    validatePrices()
-  }, [geoData])
-
-  // Run validations evrytime the price scheme changes
-  useEffect(()=>{
-    validatePrices()
-  }, [ data ])
-  
-  // To keep track of errrors from the price and price range
-  const [error, setError] = useState<{price?: string, priceRange?: string}>()
 
   // Just to make sure we always have a proper price.
-  const validatePrices = ()=>{
+  const validatePrices = useCallback(()=>{
     if(data?.pricing_scheme === "price range"){
       toNumber(data?.min_price)  >=  toNumber(data?.max_price)
        ?setError({priceRange: 'The min price should not be zero (0.0) but sould be less than the max price'}) 
@@ -55,7 +36,26 @@ export default function StepThree({}: Props) {
       setError(undefined)
     }
      
-  }
+  }, [data])
+  
+  // Get data from the localstarge and set the initial state
+  useEffect(()=>{
+    const item = localStorage.getItem('ad_data')
+    if(!item){
+      router.push('/me/ads/create?cp=1&e=no saved data')
+      return 
+    }
+    setData({...JSON.parse(item), default_currency: geoData?.currency })
+    validatePrices()
+  }, [geoData, router, validatePrices])
+
+  // Run validations evrytime the price scheme changes
+  useEffect(()=>{
+    validatePrices()
+  }, [ data, validatePrices ])
+  
+  // To keep track of errrors from the price and price range
+  const [error, setError] = useState<{price?: string, priceRange?: string}>()
 
   /**
    * Handle navigation to next page.

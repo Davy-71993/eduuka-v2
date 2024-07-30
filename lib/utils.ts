@@ -7,7 +7,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const toNumber = (str?: string | number) => Number.isNaN(parseInt(str as string)) ? 0  : parseInt(str as string)
+export const toNumber = (str?: string | number) => {
+  if(str?.toString().includes('.')){
+    return Number.isNaN(parseFloat(str as string)) ? 0  : parseFloat(str as string)
+  }
+  return Number.isNaN(parseInt(str as string)) ? 0  : parseInt(str as string)
+  
+}
 
 export const numberOrUndefine = (str?: string) => Number.isNaN(parseInt(str??'')) ? undefined  : parseInt(str??'') 
 

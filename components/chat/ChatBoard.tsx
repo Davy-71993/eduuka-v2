@@ -3,33 +3,35 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { AppContext } from '@/context/Appcontext'
 import { sendMessage } from '@/lib/actions/db_actions'
 import { createClient } from '@/lib/supabase/client'
 import { Ad, Message } from '@/lib/types'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 type Props = {
     _messages: Message[],
+    patner: string,
     channelName: string,
     me: string,
     ad: Ad,
     loadindState?: boolean
 }
 
-export default function ChatBoard({ _messages, channelName, ad, me, loadindState }: Props) {
-
-    const supabase = createClient()
+export default function ChatBoard({ _messages, patner, ad, me, loadindState, channelName }: Props) {
 
     const [messages, setMessages] = useState<Message[]>([])
     const [newMessage, setNewMessage] = useState('')
     const [loading, setLoading] = useState(false)
-    const [patner, setPatner] = useState('')
+
+    const { supabase, chatHeads, activeChatHead } = useContext(AppContext)
 
     useEffect(()=>{
         setMessages(_messages)
     }, [_messages])
 
     useEffect(()=>{
+        if(!supabase) return
         const channels = supabase.channel(channelName)
         .on(
             'postgres_changes',
@@ -45,18 +47,7 @@ export default function ChatBoard({ _messages, channelName, ad, me, loadindState
         return ()=>{
             channels.unsubscribe()
         }
-    }, [channelName, messages])
-
-    useEffect(()=>{
-        if(!channelName || !ad){
-            return
-        }
-        const h = channelName.split("_")[1]
-        const m = ad.seller_id
-
-        setPatner((me === m ? h : m)!)
-
-    }, [channelName, ad])
+    }, [channelName, messages, supabase])
 
     if(!ad || !me || loadindState){
         return (

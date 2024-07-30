@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: Props) {
            return router.push('/me/create-profile')
        }
       })()     
-   }, [pathname])
+   }, [pathname, router])
     const title = DASHBOARD_LINKS.find(link => link.url === pathname)?.title
     const setPanelSize = (size: number, changeSize: number) => {
         const panel = document.querySelector('.nav-panel')

@@ -1,7 +1,7 @@
 
 import { Ad, Location } from '@/lib/types'
-import { displayCurrencyAndPrice, prettyDistance, toNumber } from '@/lib/utils'
-import { Marker, Popup, useMap, Circle } from 'react-leaflet'
+import { displayCurrencyAndPrice, toNumber } from '@/lib/utils'
+import { Marker, Popup, Circle } from 'react-leaflet'
 import Link from 'next/link'
 import { useGeoData } from '@/lib/hooks'
 

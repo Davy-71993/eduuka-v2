@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormGroup } from '../fields'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
@@ -28,7 +28,7 @@ export default function StepFour({}: Props) {
       return
     }
     setData(JSON.parse(item))
-  }, [])
+  }, [router])
 
   const Map = useMemo(() => dynamic(
     () => import('@/components/map/MapDialog'),
@@ -40,7 +40,7 @@ export default function StepFour({}: Props) {
     ),
     ssr: false
     }
-), [data])
+), [])
 
   const getCurrentLocation = () => {
     if(!geoData?.location){
@@ -50,9 +50,9 @@ export default function StepFour({}: Props) {
     setData({...data, location: `POINT(${geoData?.location?.lon} ${geoData?.location?.lat})`})
   }
 
-  const setLocation = (lat: number, lon: number) => {
+  const setLocation = useCallback((lat: number, lon: number) => {
     setLnglat(`POINT(${lon} ${lat})`)
-  }
+  }, [])
 
   const navigateToNextPage = () => {
     localStorage.setItem('ad_data', JSON.stringify(data))
