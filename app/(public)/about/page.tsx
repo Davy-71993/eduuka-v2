@@ -2,6 +2,14 @@ import Container from '@/components/Container'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { Metadata } from 'next';
+
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+  "An online market place",
+};
 
 type Props = {}
 

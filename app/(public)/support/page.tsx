@@ -4,9 +4,15 @@ import { Textarea } from '@/components/ui/textarea'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Support",
+  description:
+  "Istant support from the uDuuka technical team",
+};
 
 type Props = {}
-
 export default function SupportPage({}: Props) {
   const submitQuery = async(e: FormData) => {
     "use server"

@@ -1,12 +1,11 @@
 "use client"
 
-import React, { useEffect, useState, useTransition } from 'react'
+import React, { useEffect, useState } from 'react'
 import { 
     DropdownMenu, 
     DropdownMenuContent, 
     DropdownMenuItem, 
     DropdownMenuLabel, 
-    DropdownMenuSeparator, 
     DropdownMenuTrigger 
 } from './ui/dropdown-menu'
 import { Button } from './ui/button'
@@ -40,7 +39,7 @@ export default function PriceMenu({ ad_id, ad_currency, requested_currency }: Pr
                 View Prices
             </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="center" className='w-full max-w-[80%]'>
             <DropdownMenuLabel>Prices</DropdownMenuLabel>
             {
                 !items
@@ -52,8 +51,8 @@ export default function PriceMenu({ ad_id, ad_currency, requested_currency }: Pr
                 <>
                     {
                         items.map((menu, index)=>(
-                            <DropdownMenuItem key={ index }>
-                                <div className="flex gap-3">
+                            <DropdownMenuItem key={ index } className='w-full'>
+                                <div className="flex gap-3 w-full">
                                     <p className="text-muted-foreground w-fit p-2">{ menu.item }</p>
                                     <p className="text-muted-foreground w-fit p-2">{ displayCurrencyAndPrice(ad_currency, requested_currency, `${menu.price}`) }</p>
                                 </div>

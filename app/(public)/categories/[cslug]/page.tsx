@@ -9,6 +9,22 @@ import { getCategoryByIDOrSlug } from '@/lib/actions/db_actions'
 import { HomeFiltersContainer } from '@/components/filtering/FilterContainers'
 import AdsList from '@/components/ads/AdsList'
 
+
+export async function generateMetadata({ params: { cslug } }: { params: any}) {
+  const category  = await getCategoryByIDOrSlug(cslug, 'name');
+  return {
+    title: category?.name,
+    description: "uDuuka item Category.",
+    alternates: {
+      canonical: `/categories/${category?.slug}`,
+    },
+    openGraph: {
+      title: category.name,
+      description: "category.description"
+    },
+  };
+}
+
 type Props = {
   params: any,
   searchParams: any

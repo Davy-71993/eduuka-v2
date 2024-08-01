@@ -1,6 +1,13 @@
 import React from 'react';
 import Form from './form';
 import Container from '@/components/Container';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Signup",
+  description:
+  "Sign up never to miss on a big deal.",
+};
 
 interface PageProps {}
 

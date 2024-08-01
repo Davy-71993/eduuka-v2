@@ -8,6 +8,22 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
+export async function generateMetadata({ params: { sid } }: { params: any}) {
+    const store  = await fetchStoreByID(sid);
+    return {
+      title: store?.name,
+      description: store?.description,
+      alternates: {
+        canonical: `/stores/${store?.id}`,
+      },
+      openGraph: {
+        title: store?.name,
+        description: "category.description",
+        images: [store?.image],
+      },
+    };
+  }
+
 type Props = {
     params: any
 }

@@ -2,8 +2,15 @@ import { CategoryCard } from '@/components/CategoryCards'
 import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import { getCategories } from '@/lib/actions/db_actions'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
+
+export const metadata: Metadata = {
+  title: "Categories",
+  description:
+  "All the categories that you can shop at uDuuka",
+};
 
 export default async function page() {
   const categories = await getCategories()

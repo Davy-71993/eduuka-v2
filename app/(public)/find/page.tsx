@@ -6,7 +6,14 @@ import SearchBar from "@/components/SearchBar"
 import StoreCard from "@/components/StoreCard"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { fetchStores, getCategories } from "@/lib/actions/db_actions"
+import { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Find",
+  description:
+  "Find geate deals, items and services. all in one place",
+};
 
 export default async function Home() {
   const categories = await getCategories()

@@ -9,18 +9,17 @@ import { useAds, useGeoData } from '@/lib/hooks'
 import { setLocation } from '@/lib/actions/business_actions'
 
 export default function AdsList({ c, sc}: { c?: string, sc?: string}) {
-  const geoData = useGeoData()
   
-  const [currency, setCurrency] = useState<string>()
   const { ads } = useAds(c, sc)
-  
-  useEffect(()=>{
-    setCurrency(geoData?.currency ?? "UGX")
-  }, [geoData])
+  const geoData = useGeoData()
+  const [currency, setCurrency] = useState<string>()
 
+  useEffect(()=>{ setCurrency(geoData?.currency)}, [geoData])
 
   useEffect(()=>{
-    if(geoData?.currency === currency) return
+    if(currency === geoData?.currency){
+      return
+    }
     setLocation({...geoData, currency})
   }, [currency, geoData])
 
@@ -34,19 +33,21 @@ export default function AdsList({ c, sc}: { c?: string, sc?: string}) {
     <>
       <div className="flex justify-between w-full">
         <h1 className="text-2xl">Filtable Ads.</h1>
-        <Select value={ currency } onValueChange={ (selectedCurrency)=>{
-          setCurrency(selectedCurrency)
-        } }>
-            <SelectTrigger className="w-fit">
-                <SelectValue placeholder={ currency } />
-            </SelectTrigger>
-            <SelectContent className='p-5 mr-5'>
-              <SelectItem value="USD">USD</SelectItem>
-              <SelectItem value="UGX">UGX</SelectItem>
-              <SelectItem value="KSH">KSH</SelectItem>
-              <SelectItem value="TSH">TSH</SelectItem>
-            </SelectContent>
-        </Select>
+        <div className="flex w-fit gap-5">
+          <Select value={ currency } onValueChange={ (selectedCurrency)=>{
+            setCurrency(selectedCurrency)
+          } }>
+              <SelectTrigger className="w-fit">
+                  <SelectValue placeholder={ currency } />
+              </SelectTrigger>
+              <SelectContent className='p-5 mr-5'>
+                <SelectItem value="UGX">UGX</SelectItem>
+                <SelectItem value="USD">USD</SelectItem>
+                <SelectItem value="KSH">KSH</SelectItem>
+                <SelectItem value="TSH">TSH</SelectItem>
+              </SelectContent>
+          </Select>
+        </div>
       </div>
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
         {

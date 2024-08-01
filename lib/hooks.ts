@@ -103,7 +103,15 @@ export const useGeoData = () => {
           if(geo){
             console.log("Using save location")
             const data = JSON.parse(geo)
-            setGeoData({...data, location})
+            if(data.currency){
+              setGeoData({...data, location})
+              return
+            }
+            if(data.country_code){
+              setGeoData({...data, location, currency: SUPPORTED_CURRANCIES[data.country_code.toUpperCase()] ?? "USD"})
+              return
+            }
+            setGeoData({...data, location, currency: "USD"})
             return
           }
           (async()=>{
@@ -115,7 +123,7 @@ export const useGeoData = () => {
               const locationData: GeoData = {
                 ...address,
                 address: display_name,
-                currency: SUPPORTED_CURRANCIES[address.country_code] ?? 'UGX',
+                currency: SUPPORTED_CURRANCIES[address.country_code] ?? 'USD',
                 location
               }
               setGeoData(locationData)

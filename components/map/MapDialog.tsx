@@ -33,7 +33,7 @@ export default function MapDialog({ setter }: { setter: (lat: number, lon: numbe
   return (
     <div className="w-full h-full relative ">
         <div className="absolute right-0 bottom-0 w-1/2 min-w-60 py-1 px-10 bg-primary z-[100000] text-center">
-            <h1 className="text-muted text-sm">Maps by <Link href={'https:www.dolinesystems.com'} className="hover:font-bold">Doline Sysytems</Link></h1>
+            <h1 className="text-muted text-sm">Maps by <Link href={'https:www.dolinesystems.com'} className="hover:font-bold">Doline Systems</Link></h1>
         </div>
         <MapContainer className="h-full w-full relative" center={[center.lat, center.lon]} zoom={14} scrollWheelZoom={true}>
             <TileLayer

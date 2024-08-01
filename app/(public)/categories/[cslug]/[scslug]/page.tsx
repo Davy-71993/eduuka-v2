@@ -7,6 +7,21 @@ import { getSubCategory } from '@/lib/actions/db_actions'
 import { HomeFiltersContainer } from '@/components/filtering/FilterContainers'
 import AdsList from '@/components/ads/AdsList'
 
+export async function generateMetadata({ params: { scslug } }: { params: any}) {
+  const sub_category  = await getSubCategory(scslug, 'name, categories(name, slug)');
+  return {
+    title: `${sub_category.categories?.name} - ${sub_category?.name}`,
+    description: "uDuuka item Category.",
+    alternates: {
+      canonical: `/categories/${sub_category.categories?.slug}/${sub_category?.slug}`,
+    },
+    openGraph: {
+      title: sub_category.name,
+      description: "Sub_category Description"
+    },
+  };
+}
+
 type Props = {
   params: any
 }

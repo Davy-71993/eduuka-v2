@@ -4,6 +4,13 @@ import Container from '@/components/Container';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Signin",
+  description:
+  "Sign in never to miss on a big deal.",
+};
 
 type Props = {
   searchParams: any
