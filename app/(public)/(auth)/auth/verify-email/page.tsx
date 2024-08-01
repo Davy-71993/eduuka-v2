@@ -1,4 +1,11 @@
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Verify Email",
+  description:
+  "Verify your email",
+};
 
 const Page = () => {
   return (

@@ -18,6 +18,14 @@ import StoreCard from "@/components/StoreCard"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { fetchStores, getCategories } from "@/lib/actions/db_actions"
 import Link from "next/link"
+import { Metadata } from 'next';
+
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+  "An online market place",
+};
 
 export default async function Home() {
   const categories = await getCategories()

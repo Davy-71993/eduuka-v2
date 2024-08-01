@@ -3,8 +3,15 @@ import Container from '@/components/Container'
 import SearchBar from '@/components/SearchBar'
 import StoreCard from '@/components/StoreCard'
 import { fetchStores } from '@/lib/actions/db_actions'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
+
+export const metadata: Metadata = {
+  title: "Stores",
+  description:
+  "Best stores to shop from near you and accros the globe",
+};
 
 type Props = {}
 

@@ -1,5 +1,12 @@
 import Container from '@/components/Container'
+import { Metadata } from 'next';
 import React from 'react'
+
+export const metadata: Metadata = {
+    title: "About - Policies",
+    description:
+    "Istant support from the uDuuka technical team",
+  };
 
 type Props = {}
 

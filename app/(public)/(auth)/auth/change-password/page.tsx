@@ -1,5 +1,12 @@
 import React from 'react';
 import Form from './form';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Change Password",
+  description:
+  "Change your password.",
+};
 
 const Page = async() => {
   return (

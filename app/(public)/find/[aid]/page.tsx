@@ -10,6 +10,23 @@ import ImageWithFallbackUrl from '@/components/ImageWithFallbackUrl'
 import SimilarAdsList from '@/components/ads/SimilarAdsList'
 import PricePanel from '@/components/PricePanel'
 
+
+export async function generateMetadata({ params: { aid } }: { params: any}) {
+  const ad  = await getAdByID(aid);
+  return {
+    title: ad?.name,
+    description: ad?.description,
+    alternates: {
+      canonical: `/find/${ad?.id}`,
+    },
+    openGraph: {
+      title: ad?.name,
+      description: "category.description",
+      images: [ad?.ad_images],
+    },
+  };
+}
+
 type Props = {
   params: any,
   searchParams: any
