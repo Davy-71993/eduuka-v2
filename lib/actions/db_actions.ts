@@ -7,7 +7,7 @@ import { numberOrUndefine } from "../utils"
 
 
 // Category and SubCategory actions
-export const getCategories =  async(fields='name, id, slug, image, ads(count), sub_categories(id, name, slug)') => {
+export const getCategories =  async(fields='name, id, slug, ads(count), sub_categories(id, name, slug)') => {
     const supabase = createClient(cookies())
 
     const { data, error } = await supabase.from('categories').select(fields)
@@ -16,7 +16,7 @@ export const getCategories =  async(fields='name, id, slug, image, ads(count), s
     return data as Category[]
 }
 
-export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, image, slug, ads(count))') => {
+export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, slug, sub_categories(id, name, slug, ads(count))') => {
     const supabase = createClient(cookies())
     let query = supabase.from('categories').select(fields)
     Number.isNaN(parseInt(idOrSlug))
@@ -28,7 +28,7 @@ export const getCategoryByIDOrSlug = async(idOrSlug:string, fields = 'name, id, 
     return data as Category
 }
 
-export const getSubCategory =  async(idOrSlug:string, fields='id, name, slug, image, categories(name, slug, image)') => {
+export const getSubCategory =  async(idOrSlug:string, fields='id, name, slug, categories(name, slug)') => {
     const supabase = createClient(cookies())
     let query = supabase.from('sub_categories').select(fields)
     Number.isNaN(parseInt(idOrSlug))
