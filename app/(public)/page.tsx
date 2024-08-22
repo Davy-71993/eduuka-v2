@@ -38,9 +38,8 @@ export default async function Home() {
 
         {/* Filters */}
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col gap-5 mb-10">
-          <DesktopCategories categories={ categories } />
-          
           <HomeFiltersContainer />
+          <DesktopCategories categories={ categories } />
         </div>
         
         <div className="w-full md:w-[80%] flex flex-col gap-5 md:px-5 overflow-hidden">

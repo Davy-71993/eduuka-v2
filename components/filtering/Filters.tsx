@@ -233,19 +233,27 @@ export const MobileCategories = ({categories}:{ categories: Category[]}) => (
 
 export const DesktopCategories = ({categories}:{ categories: Category[]}) => (
     <div className="rounded-sm w-full">
-        <Link href={'/categories'} className="px-5 rounded-t-sm py-3 bg-primary hover:bg-primary/95 text-muted w-full block border-b text-lg">See all Categories</Link>
+        <Link href={'/categories'} className="px-5 rounded-t-sm py-1 bg-primary hover:bg-primary/95 text-muted line-clamp-1 w-full block border-b text-lg">See all Categories</Link>
         {
             categories.map((cate, index) => (
                 <SlideToLeft key={ index } title={ cate.name } className={index === categories.length-1 ? 'rounded-b-sm' : ''}>
                     {
                         (cate.sub_categories??[]).length  > 0 &&
                         <div className="w-full max-w-60 rounded-sm z-50 bg-background">
-                            <Link href={`/categories/${cate.slug}`} className="px-5 py-3 bg-primary hover:bg-primary/95 text-muted rounded-t-sm w-full block border-b text-lg">See all in { cate.name}</Link>
-                            {
-                                cate.sub_categories?.map((scate, ind)=>(
-                                    <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } className={`bg-primary text-muted px-5 block w-full py-2 min-w-60 hover:bg-primary/95 ${ ind === (cate.sub_categories??[]).length-1 ? 'rounded-b-sm' : ''}`}>{ scate.name }</Link>
-                                ))
-                            }
+                            <Link href={`/categories/${cate.slug}`}>
+                                <p className="px-5 py-1 line-clamp-1 bg-primary hover:bg-primary/95 text-muted rounded-t-sm w-full block border-b text-lg">
+                                    See all in { cate.name}
+                                </p> 
+                            </Link>
+                                {
+                                    cate.sub_categories?.map((scate, ind)=>(
+                                        <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } >
+                                            <p className={`bg-primary text-muted px-5 w-full py-1 min-w-60 hover:bg-primary/95 line-clamp-1 ${ ind === (cate.sub_categories??[]).length-1 ? 'rounded-b-sm' : ''}`}>
+                                                { scate.name }
+                                            </p> 
+                                        </Link>
+                                    ))
+                                }
                         </div>
                     }
                 </SlideToLeft>
@@ -401,7 +409,7 @@ export const Distance = () => {
                                 <SelectTrigger className="w-full rounded-none border-none text-lg">
                                     <SelectValue placeholder={units}/>
                                 </SelectTrigger>
-                                <SelectContent className="w-full">
+                                <SelectContent className="w-full z-[10000]">
                                     <SelectItem value="Meters" >Meters</SelectItem>
                                     <SelectItem value="Kilometers" >Kilometers</SelectItem>
                                     <SelectItem value="Miles" >Miles</SelectItem>

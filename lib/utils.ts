@@ -2,6 +2,8 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Message } from "./types"
+import { MdElectricalServices } from "react-icons/md";
+import { ComponentType } from "react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -147,5 +149,15 @@ export const toMoney = (money: string) => {
   }
   return bc+res
 }
+
+export const categoriesIcons: {
+  slug: string,
+  Icon: ComponentType
+}[] = [
+  {
+    slug: 'electronics',
+    Icon: MdElectricalServices
+  }
+]
 
 
