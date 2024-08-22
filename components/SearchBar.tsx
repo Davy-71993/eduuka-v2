@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { KeyboardEvent, useCallback, useEffect, useState } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { MapPin, Search } from 'lucide-react'
@@ -31,20 +31,25 @@ export default function SearchBar({ includeLocation , toUrl }: Props) {
 
   const searchQuery = useSearch(qtObj)
 
+  const enter = useCallback((e:KeyboardEvent) => {
+    if(e.key === 'Enter'){
+      document.getElementById('link')?.click()
+    }
+  }, [])
+
   return (
     <div className='flex w-full max-w-[600px] border border-primary rounded-sm mx-auto bg-primary-foreground'>
       {
         pathName !== '/map' &&
         <Link href="/map">
-          <Button className='rounded-none font-normal rounded-l-sm bg-primary-foreground text-primary hover:text-primary-foreground text-xs sm:text-lg p-2 sm:h-full'><MapPin /> <span className='ml-2'>View in Map</span></Button>
+          <Button className='rounded-none font-normal rounded-l-sm bg-primary-foreground text-primary hover:text-primary-foreground text-xs sm:text-lg p-2 sm:h-full'>
+            <MapPin /> 
+            <span className='ml-2'><span className='hidden sm:inline'>View in</span> Map</span>
+          </Button>
         </Link>
       }
       <Input value={ searchTerm ?? '' } type='text' 
-        onKeyDownCapture={ (e) => {
-          if(e.key === 'Enter'){
-            document.getElementById('link')?.click()
-          }
-        } }
+        onKeyDownCapture={ (e)=>{ enter(e)} }
         onChange={ (e)=>{ setSearchTerm(e.target.value) } }
         className={`rounded-none ${includeLocation ? 'border-l rounded-l-sm sm:rounded-none' : 'rounded-l-sm'} border-r border-primary-foreground sm:text-lg`} placeholder='Type here to search'/>
       <Link id='link' href={ `${toUrl ?? currentPath }${ searchQuery }` }>

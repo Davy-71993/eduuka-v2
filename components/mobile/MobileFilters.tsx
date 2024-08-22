@@ -6,6 +6,8 @@ import { Category, SubCategory } from '@/lib/types'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { NavigationMenuLink } from '../ui/navigation-menu'
+import { useSearch } from '@/lib/hooks'
+import { usePathname } from 'next/navigation'
 
 type Props = {
     categories: Category[]
@@ -33,12 +35,19 @@ export default function MobileFilters({ categories }: Props) {
 }
 
 const Filters = () => {
+    const [filters, setFilters] = useState<any>()
+    const pathName = usePathname()
+    const queryString = useSearch(filters)
     return(
         <div className="flex flex-col gap-5 w-full py-5 rounded-b-sm bg-secondary">
-            <PriceRange  />
-            <OrderBy />
-            <Distance  />
-            <Button className='text-xl w-[90%] mx-auto'>Apply Filters</Button>
+            <PriceRange setter={ setFilters } />
+            <OrderBy setter={ setFilters } />
+            <Distance setter={ setFilters } />
+            <NavigationMenuLink asChild>
+                <Link href={`${pathName}${queryString}`} className='block w-[90%] mx-auto'>
+                    <Button className='text-xl w-full'>Apply Filters</Button>
+                </Link>
+            </NavigationMenuLink>
         </div>
     )
 }
