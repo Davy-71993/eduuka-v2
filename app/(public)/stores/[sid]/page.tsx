@@ -1,6 +1,7 @@
 import AdCard from '@/components/ads/AdCard'
 import Container from '@/components/Container'
 import FadingLine from '@/components/FadingLine'
+import { HomeFiltersContainer } from '@/components/filtering/FilterContainers'
 import { DesktopCategories, PriceRange, Rating } from '@/components/filtering/Filters'
 import SearchBar from '@/components/SearchBar'
 import { getStoreAds, fetchStoreByID, getCategories } from '@/lib/actions/db_actions'
@@ -46,9 +47,8 @@ export default async function StorePage({ params }: Props) {
                     <p className="text-lg">{ store?.description }</p>
                     <Link href={`/stores/${store?.id}/details`} className='text-blue-500 hover:text-blue-600'>See store details {">>"}</Link>
                 </div>
+                <HomeFiltersContainer />
                 <DesktopCategories categories={ categories } />
-                <PriceRange />
-                <Rating />
             </div>
             <div className="w-full md:w-[80%] flex flex-col space-y-5 md:px-5 overflow-hidden">
                 <h1 className="text-2xl">Ads from { store?.name }</h1>

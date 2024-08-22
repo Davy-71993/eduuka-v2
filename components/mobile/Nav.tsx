@@ -15,10 +15,9 @@ import { Button } from '../ui/button'
 import { usePathname } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
 import { MobileLinkItem } from '@/app/(private)/me/LinkItem'
-import { ScrollArea } from '../ui/scroll-area'
 import { Category } from '@/lib/types'
 import { AppContext } from '@/context/Appcontext'
-import { Location, MobileCategories, PriceRange, Rating } from '../filtering/Filters'
+import MobileFilters from './MobileFilters'
 
 type Props = {
     categories: Category[]
@@ -54,7 +53,7 @@ export default function Nav({ categories }: Props) {
                 <NavigationMenuTrigger className='hover:bg-primary-foreground hover:text-primary border-2 border-primary-foreground rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <User/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col min-w-[18rem] self-center p-5'>
+                <NavigationMenuContent className='flex flex-col w-full self-center p-5'>
                     {
                         authenticated ?
                             <>
@@ -101,11 +100,11 @@ export default function Nav({ categories }: Props) {
                 <NavigationMenuTrigger className='hover:bg-background hover:text-primary border-2 border-background rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <Menu/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col min-w-[18.5rem] h-fit max-h-[80vh] w-full'>
+                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-[90vw] max-w-96'>
                     {
                         pathname.startsWith('/me')?(
                             <>
-                            <div className="flex flex-col space-y-1 p-3">
+                            <div className="flex flex-col gap-1 p-3">
                                 {
                                     DASHBOARD_LINKS.map((link, index)=>(
                                         <NavigationMenuLink key={index} >
@@ -117,15 +116,7 @@ export default function Nav({ categories }: Props) {
                             </div>
                             </>
                         ):(
-                            <ScrollArea className='h-[80vh]'>
-                                <h1 className="text-center text-xl border-b p-2">Filter ads by:</h1>
-                                <div className='flex h-max flex-col space-y-3 p-3'>
-                                    <MobileCategories categories={categories} />
-                                    <Location />
-                                    <PriceRange />
-                                    <Rating />
-                                </div>
-                            </ScrollArea>
+                            <MobileFilters categories={ categories } />
                         )
                     }
                 </NavigationMenuContent>
