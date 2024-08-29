@@ -1,11 +1,8 @@
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
-import Cookies from "js-cookie";
-import axios from "axios";
+import { useContext, useEffect, useMemo, useState, useTransition } from "react";
 import { fetchNearbyAds } from "./actions/db_actions";
-import { Ad, GeoData } from "./types";
-import { setLocation } from "./actions/business_actions";
-import { SUPPORTED_CURRANCIES } from "./defaults";
+import { Ad } from "./types";
+import { AppContext } from "@/context/Appcontext";
 
 /**
  * A function that generates the query string depending on the desired filters and
@@ -61,13 +58,13 @@ export const useSearch = (query?: any) => {
 /**
  * A function that handles fetching ads based on distance from the client from the data base
  * 
- * @param cat The category id. Only required on /categories/[cslug] to filter specific category ads
- * @param subCat The sub-category id. Only required on /categories/[cslug]/[scslug] to filter specific 
+ * @param cid The category id. Only required on /categories/[cslug] to filter specific category ads
+ * @param scid The sub-category id. Only required on /categories/[cslug]/[scslug] to filter specific 
  *               sub-category ads
  * @returns Loading state or ads list.
  */
-export const useAds = (cat?: string, subCat?: string) => {
-  const geo = useGeoData()
+export const useAds = (cid?: string, scid?: string) => {
+  const { geoData } = useContext(AppContext)
   const filters = useFilters()
 
   const [ads, setAds] = useState<Ad[]>()
@@ -75,114 +72,22 @@ export const useAds = (cat?: string, subCat?: string) => {
 
   useEffect(()=>{
     startLoading(async()=>{
-      if(!geo) return
+      if(!geoData?.location) return
       let filterBody = filters
-      if(cat){
-        filterBody = { ...filterBody, cat }
+      if(cid){
+        filterBody = { ...filterBody, cid }
       }
-      if(subCat){
-        filterBody = { ...filterBody, subCat}
+      if(scid){
+        filterBody = { ...filterBody, scid}
       }
-      const ads = await fetchNearbyAds(geo?.location?.lat, geo?.location?.lon, filterBody)
+      console.log("Start fetching ads")
+      const ads = await fetchNearbyAds(geoData.location.lat, geoData.location.lon, filterBody)
+      console.log("Done fetching ads")
       setAds(ads)
     })
-  }, [cat, subCat, geo, filters])
+  }, [cid, scid, geoData?.location, filters])
 
   return { ads, loading }
-}
-
-export const useGeoData = () => {
-  const [geoData, setGeoData] = useState<GeoData>()
-  useEffect(()=>{
-    const geo = Cookies.get('geo')
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        (result) => {
-          const { latitude, longitude, accuracy } = result.coords
-          const location = {lat: latitude, lon: longitude, accuracy}
-          if(geo){
-            console.log("Using save location")
-            const data = JSON.parse(geo)
-            if(data.currency){
-              setGeoData({...data, location})
-              return
-            }
-            if(data.country_code){
-              setGeoData({...data, location, currency: SUPPORTED_CURRANCIES[data.country_code.toUpperCase()] ?? "USD"})
-              return
-            }
-            setGeoData({...data, location, currency: "USD"})
-            return
-          }
-          (async()=>{
-            console.log("Fetching new Location")
-            try {
-              const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${location.lat}&lon=${location.lon}`)
-              const data = res.data
-              const { address, display_name } = data
-              const locationData: GeoData = {
-                ...address,
-                address: display_name,
-                currency: SUPPORTED_CURRANCIES[address.country_code] ?? 'USD',
-                location
-              }
-              setGeoData(locationData)
-            } catch (error) {
-              console.log("An error ocured while goe-reverse coding")
-              const data: GeoData = {
-                city: '',
-                country: '',
-                currency: 'UGX',
-                region: '',
-                location: {accuracy: 0, lat: 0, lon: 0}
-              }
-              setGeoData(data)
-            }
-          })()
-          return
-        },
-        (error) => {
-          console.log("Navigtor error: ", error.message)
-          if(geo){
-            console.log("Using save location")
-            // To-do
-            // Later use this geo.location lat and lon to fetch the details from openstreatmap. 
-            setGeoData(JSON.parse(geo))
-            return
-          }
-          const data: GeoData = {
-            city: '',
-            country: '',
-            currency: 'UGX',
-            region: '',
-            location: {accuracy: 0, lat: 0, lon: 0}
-          }
-          setGeoData(data)
-        }
-      )
-      return
-    }
-    console.log("Unsupported browser")
-    if(geo){
-      console.log("Using save location")
-      setGeoData(JSON.parse(geo))
-      return
-    }
-    const data: GeoData = {
-      city: '',
-      country: '',
-      currency: 'UGX',
-      region: '',
-      location: {accuracy: 0, lat: 0, lon: 0}
-    }
-    setGeoData(data)
-  }, [])
-
-  useEffect(()=>{
-    setLocation(geoData)
-  }, [geoData])
-
-  return geoData
 }
 
 export const useFilters = () => {

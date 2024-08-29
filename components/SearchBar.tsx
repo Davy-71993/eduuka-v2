@@ -5,7 +5,7 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { useSearch } from '@/lib/hooks'
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 export default function SearchBar({ includeLocation , toUrl }: Props) {
   const pathName = usePathname()
   const searchParmas = useSearchParams()
+  const aid = useParams()['aid']
 
   const currentPath = usePathname()
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -40,8 +41,8 @@ export default function SearchBar({ includeLocation , toUrl }: Props) {
   return (
     <div className='flex w-full max-w-[600px] border border-primary rounded-sm mx-auto bg-primary-foreground'>
       {
-        pathName !== '/map' &&
-        <Link href="/map">
+        !pathName.startsWith('/map') &&
+        <Link href={ aid ? `/map/${aid}` : '/map'}>
           <Button className='rounded-none font-normal rounded-l-sm bg-primary-foreground text-primary hover:text-primary-foreground text-xs sm:text-lg p-2 sm:h-full'>
             <MapPin /> 
             <span className='ml-2'><span className='hidden sm:inline'>View in</span> Map</span>

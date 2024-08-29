@@ -5,7 +5,7 @@ import { LocateFixed } from 'lucide-react'
 import { prettyDistance } from '@/lib/utils'
 import { AspectRatio } from '../ui/aspect-ratio'
 import ImageWithFallbackUrl from '../ImageWithFallbackUrl'
-import PriceTag from '../PriceTag'
+import PriceTag from '../pricing/PriceTag'
 
 type Props = {
     ad: Ad,

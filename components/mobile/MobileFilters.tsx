@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { NavigationMenuLink } from '../ui/navigation-menu'
 import { useSearch } from '@/lib/hooks'
 import { usePathname } from 'next/navigation'
+import CategoryButton from './CategoryButton'
 
 type Props = {
     categories: Category[]
@@ -39,7 +40,7 @@ const Filters = () => {
     const pathName = usePathname()
     const queryString = useSearch(filters)
     return(
-        <div className="flex flex-col gap-5 w-full py-5 rounded-b-sm bg-secondary">
+        <div className="flex flex-col gap-5 w-full h-full py-5 rounded-b-sm bg-secondary">
             <PriceRange setter={ setFilters } />
             <OrderBy setter={ setFilters } />
             <Distance setter={ setFilters } />
@@ -60,12 +61,12 @@ const Categories = ({ categories }: { categories: Category[]}) => {
         setSubCategories(selected?.sub_categories)
     } , [selected])
     return(
-        <div className="flex flex-col w-full pb-5 rounded-b-sm bg-secondary overflow-hidden">
+        <div className="flex flex-col h-full w-full pb-5 rounded-b-sm bg-secondary overflow-hidden">
             {
                 !selected 
                 ?
                 categories.map((category, index) => (
-                    <div onClick={ ()=>{ setSelected(category) } } key={index} className='px-5 py-1 text-xl cursor-pointer hover:text-primary transition-colors'>{ category.name}</div>
+                    <CategoryButton key={ index } category={ category } setSelected={ setSelected } />
                 ))
                 :
                 <div className="flex flex-col gap-3 w-full">
@@ -78,7 +79,7 @@ const Categories = ({ categories }: { categories: Category[]}) => {
                         </div>
                         <NavigationMenuLink asChild>
                             <Link href={`/categories/${selected.slug}`}>
-                                <p className='flex-1 text-center w-full line-clamp-1 text-xl font-bold text-primary'>
+                                <p className='flex-1 text-center w-full line-clamp-1 text-lg font-bold text-primary'>
                                     { selected.name }
                                 </p>
                             </Link>
@@ -88,7 +89,7 @@ const Categories = ({ categories }: { categories: Category[]}) => {
                         subCategories?.map((subCategory, index) => (
                             <NavigationMenuLink key={index} asChild>
                                 <Link href={`/categories/${selected.slug}/${subCategory.slug}`}>
-                                    <p className='px-5 py-1 text-xl hover:text-primary'>{ subCategory.name}</p>
+                                    <p className='px-5 py-1 text-lg hover:text-primary'>{ subCategory.name}</p>
                                 </Link>
                             </NavigationMenuLink>
                         ))

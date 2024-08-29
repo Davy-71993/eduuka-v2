@@ -2,26 +2,22 @@
 
 
 import AdCard from './AdCard'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import AdListSkelton from './AdListSkelton '
-import { useAds, useGeoData } from '@/lib/hooks'
-import { setLocation } from '@/lib/actions/business_actions'
+import { useAds } from '@/lib/hooks'
+import { AppContext } from '@/context/Appcontext'
+import Currency from './Currency'
 
 export default function AdsList({ c, sc}: { c?: string, sc?: string}) {
   
   const { ads } = useAds(c, sc)
-  const geoData = useGeoData()
-  const [currency, setCurrency] = useState<string>()
+  const { geoData } = useContext(AppContext)
 
-  useEffect(()=>{ setCurrency(geoData?.currency)}, [geoData])
+  const [currency, setCurrency] = useState('USD')
 
   useEffect(()=>{
-    if(currency === geoData?.currency){
-      return
-    }
-    setLocation({...geoData, currency})
-  }, [currency, geoData])
+    setCurrency(geoData?.currency ?? 'USD')
+  }, [geoData])
 
   if(!ads){
     return (
@@ -33,21 +29,7 @@ export default function AdsList({ c, sc}: { c?: string, sc?: string}) {
     <>
       <div className="flex justify-between w-full">
         <h1 className="text-2xl">Filtable Ads.</h1>
-        <div className="flex w-fit gap-5">
-          <Select value={ currency } onValueChange={ (selectedCurrency)=>{
-            setCurrency(selectedCurrency)
-          } }>
-              <SelectTrigger className="w-fit">
-                  <SelectValue placeholder={ currency } />
-              </SelectTrigger>
-              <SelectContent className='p-5 mr-5'>
-                <SelectItem value="UGX">UGX</SelectItem>
-                <SelectItem value="USD">USD</SelectItem>
-                <SelectItem value="KSH">KSH</SelectItem>
-                <SelectItem value="TSH">TSH</SelectItem>
-              </SelectContent>
-          </Select>
-        </div>
+        <Currency currency={ currency } />
       </div>
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
         {

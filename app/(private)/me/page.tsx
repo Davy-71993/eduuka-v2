@@ -12,7 +12,7 @@ import { Lock, User } from 'lucide-react'
 import { redirect } from 'next/navigation'
 
 
-export default async function page({ searchParams }: { searchParams: any}) {
+export default async function MyPage({ searchParams }: { searchParams: any}) {
   const profile  = await getProfile()
   if(!profile){
     return redirect('/me/create-profile')

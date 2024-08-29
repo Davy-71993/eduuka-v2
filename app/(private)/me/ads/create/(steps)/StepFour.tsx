@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { FormGroup } from '../fields'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
@@ -7,16 +7,14 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ArrowBigLeft, ArrowBigRight } from 'lucide-react'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
-import MapView from '@/components/map/MapView'
 import dynamic from 'next/dynamic'
 import LoadingDots from '@/components/LoadingDots'
-import { DialogDescription } from '@radix-ui/react-dialog'
-import { useGeoData } from '@/lib/hooks'
+import { AppContext } from '@/context/Appcontext'
 
 type Props = {}
 
 export default function StepFour({}: Props) {
-  const geoData = useGeoData()
+  const { geoData } = useContext(AppContext)
   const router = useRouter()
   const [data, setData] = useState<AdData>()
   const [lnglat, setLnglat] = useState(data?.location)

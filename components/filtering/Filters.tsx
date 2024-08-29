@@ -1,16 +1,14 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
 import { Category, SubCategory } from "@/lib/types"
 import { AccordionTrigger } from "@radix-ui/react-accordion"
-import { Check, ChevronDown, CircleAlert, Star } from "lucide-react"
+import { Check, ChevronDown, ChevronUp, CircleAlert, Star } from "lucide-react"
 import Link from "next/link"
-import { NavigationMenuLink } from "@radix-ui/react-navigation-menu"
 import { toNumber } from "@/lib/utils"
 import { Button } from "../ui/button"
-import { ScrollArea } from "../ui/scroll-area"
 import SlideToLeft from "../animated/SlideToLeft"
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import { Label } from "../ui/label"
@@ -118,149 +116,123 @@ export const PriceRange = ({
     )
 }
 
-export const Rating = () => {
-    const [minRating, setMinRating] = useState<number>()
-    return (
-        <FormGroup label="Rating">
-            <Button onClick={()=>{setMinRating(5)}} 
-            className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
-                <div className="w-fit flex">
-                    <Star /><Star /><Star /><Star /><Star />
-                </div>
-                <div className="w-fit">
-                    <p className="self-end">5</p>
-                </div>
-                {
-                    minRating === 5 &&
-                    <Check />
-                }
-            </Button>
-            <Button onClick={()=>{setMinRating(4)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
-                <div className="w-fit flex">
-                    <Star /><Star /><Star /><Star />
-                </div>
-                <div className="w-fit">
-                    <p className="self-end">4 and above</p>
-                </div>
-                {
-                    minRating === 4 &&
-                    <Check />
-                }
-            </Button>
-            <Button onClick={()=>{setMinRating(3)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
-                <div className="w-fit flex">
-                    <Star /><Star /><Star />
-                </div>
-                <div className="w-fit">
-                    <p className="self-end">3 and above</p>
-                </div>
-                {
-                    minRating === 3 &&
-                    <Check />
-                }
-            </Button>
-            <Button onClick={()=>{setMinRating(2)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">
-                <div className="w-fit flex">
-                    <Star/><Star />
-                </div>
-                <div className="w-fit">
-                    <p className="self-end"> 2 and above</p>
-                </div>
-                {
-                    minRating === 2 &&
-                    <Check />
-                }
-            </Button>
-            <Button onClick={()=>{setMinRating(undefined)}} className="bg-primary-foreground border-2 border-yellow-500 hover:border-yellow-600 flex w-full text-yellow-500 hover:text-yellow-600 transition-colors p-3 hover:bg-yellow-100 justify-between items-center">Clear Rating</Button>
-        </FormGroup>
-                
-    )
-}
-
-export const Location = () =>{
-    return (
-        <div className="w-full py-2 border-none bg-secondary rounded-sm">
-            <div className='w-full border-none border-t px-2'>
-                <div className="w-full text-xl">
-                    <div className="flex justify-between items-center p-2">
-                        <span>Location</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    )
-}
-
-export const MobileCategories = ({categories}:{ categories: Category[]}) => (
-    <Accordion type="single" collapsible className="w-full py-2 border-none bg-secondary h-fit max-h-full rounded-sm">
-        <AccordionItem value="categories" className='w-full flex flex-col border-none border-t px-2 h-full'>
-            <AccordionTrigger className="w-full text-xl p-2 flex justify-between items-center hover:bg-background transition-all rounded-sm">
-                <span>Categories</span> <ChevronDown/>
-            </AccordionTrigger>
-            <AccordionContent className="flex-1">
-                <ScrollArea scrollHideDelay={3} className="w-full h-[20rem]">
-                    <Accordion collapsible type='single' className='w-full border-none pr-4'>
-                        {categories.map((cat, i) => (
-                            <AccordionItem value={ ''+i+1 } key={ i+1 } className='w-full px-3 transition-colors hover:bg-background border-none rounded-sm'>
-                                <AccordionTrigger className="w-full text-xl p-2 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm">{ cat.name }</AccordionTrigger>
-                                <AccordionContent className='flex flex-col text-left'>
-                                    {
-                                        cat.sub_categories?.map((scat, sci)=>(
-                                            <Link key={sci} className='flex p-2 rounded-sm hover:bg-secondary text-left transition-all' href={`/categories/${cat.slug}/${scat.slug}`}>
-                                                <NavigationMenuLink>
-                                                    { scat.name }
-                                                </NavigationMenuLink>
-                                            </Link>
-                                        ))
-                                    }
-                                    <NavigationMenuLink>
-                                        <Link className="w-full hover:text-prbg-primary/95hover:bg-primary/95 p-2 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href={`/categories/${cat.slug}`}>All { cat.name }</Link>
-                                    </NavigationMenuLink>
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                        <NavigationMenuLink>
-                            <Link className="w-full hover:text-prbg-primary/95hover:bg-primary/95 text-xl py-2 px-5 justify-between items-center text-left line-clamp-1 hover:bg-background transition-all rounded-sm" href="/categories">All Categories</Link>
-                        </NavigationMenuLink>
-                    </Accordion>
-                </ScrollArea>
-            </AccordionContent>
-        </AccordionItem>
-    </Accordion>
-)
-
-export const DesktopCategories = ({categories}:{ categories: Category[]}) => (
-    <div className="rounded-sm w-full">
-        <Link href={'/categories'} className="px-5 rounded-t-sm py-1 bg-primary hover:bg-primary/95 text-muted line-clamp-1 w-full block border-b text-lg">See all Categories</Link>
-        {
-            categories.map((cate, index) => (
-                <SlideToLeft key={ index } title={ cate.name } className={index === categories.length-1 ? 'rounded-b-sm' : ''}>
+export const DesktopCategories = ({categories}:{ categories: Category[]}) => {
+    const [subOpen, setSubOpen] = useState(false)
+    const [scrollPosition, setScrollPosition] = useState<"top" | "bottom">('top')
+    const [subScrollPosition, setSubScrollPosition] = useState<"top" | "bottom">('top')
+    const panelRef = useRef<HTMLDivElement>(null)
+    const subPanelRef = useRef<HTMLDivElement>(null)
+    const handleScroll = useCallback(()=>{
+        if(!panelRef.current){
+            return
+        }
+        if(scrollPosition === 'top'){
+            panelRef.current.scrollTo({
+                behavior: "smooth",
+                top: window.innerHeight*(65/100)
+            })
+            setScrollPosition('bottom')
+        }else{
+            panelRef.current.scrollTo({
+                behavior: "smooth",
+                top: 0
+            })
+            setScrollPosition('top')
+        }
+    }, [scrollPosition])
+    const handleSubScroll = useCallback(()=>{
+        if(!subPanelRef.current){
+            return
+        }
+        if(subScrollPosition === 'top'){
+            subPanelRef.current.scrollTo({
+                behavior: "smooth",
+                top: window.innerHeight*(65/100)
+            })
+            setSubScrollPosition('bottom')
+        }else{
+            subPanelRef.current.scrollTo({
+                behavior: "smooth",
+                top: 0
+            })
+            setSubScrollPosition('top')
+        }
+    }, [subScrollPosition])
+    return(
+        <div className="rounded-sm w-full h-[65vh] relative">
+            <div ref={ panelRef } className={`h-[65vh] w-full overflow-hidden rounded-sm bg-primary/95 ${subOpen ? 'rounded-r-none' : ''}`}>
+                <div className="h-max">
+                    <Link href={'/categories'} className="px-5 rounded-t-sm py-1 text-muted line-clamp-1 w-full hover:bg-primary transition-colors border-b text-lg">See all Categories</Link>
                     {
-                        (cate.sub_categories??[]).length  > 0 &&
-                        <div className="w-full max-w-60 rounded-sm z-50 bg-background">
-                            <Link href={`/categories/${cate.slug}`}>
-                                <p className="px-5 py-1 line-clamp-1 bg-primary hover:bg-primary/95 text-muted rounded-t-sm w-full block border-b text-lg">
-                                    See all in { cate.name}
-                                </p> 
-                            </Link>
+                        categories.map((cate, index) => (
+                            <SlideToLeft onOpen={ setSubOpen } key={ index } title={ cate.name } className={index === categories.length-1 ? 'rounded-b-sm' : ''}>
                                 {
-                                    cate.sub_categories?.map((scate, ind)=>(
-                                        <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } >
-                                            <p className={`bg-primary text-muted px-5 w-full py-1 min-w-60 hover:bg-primary/95 line-clamp-1 ${ ind === (cate.sub_categories??[]).length-1 ? 'rounded-b-sm' : ''}`}>
-                                                { scate.name }
+                                    (cate.sub_categories??[]).length  > 0 &&
+                                    <div ref={subPanelRef} className="w-full max-w-60 relative overflow-hidden z-50">
+                                        <Link href={`/categories/${cate.slug}`}>
+                                            <p className="px-5 py-1 line-clamp-1 text-muted w-full border-b hover:bg-primary transition-colors text-lg">
+                                                See all in { cate.name}
                                             </p> 
                                         </Link>
-                                    ))
+                                        {
+                                            cate.sub_categories?.map((scate, ind)=>(
+                                                <Link href={`/categories/${cate.slug}/${scate.slug}`} key={ ind } >
+                                                    <p className={`text-muted px-5 w-full hover:bg-primary transition-colors py-1 min-w-60 line-clamp-1`}>
+                                                        { scate.name }
+                                                    </p> 
+                                                </Link>
+                                            ))
+                                        }
+                                        {
+                                            cate.slug === 'services' &&
+                                            <Button 
+                                                className={`absolute rounded-none px-5 text-teal-300 hover:text-teal-200 ${ subScrollPosition === 'top' ? 'bottom-0 rounded-b-sm' : 'top-0 rounded-t-sm' } justify-between left-0 w-full bg-primary text-base font-thin`}
+                                                onClick={ handleSubScroll }
+                                            >
+                                                <span>
+                                                    {
+                                                        subScrollPosition === 'top' 
+                                                        ? `More ${cate.name}`
+                                                        : "Back to Top"
+                                                    }
+                                                </span>
+                                                    {
+                                                        subScrollPosition === 'top' 
+                                                        ? <ChevronDown /> 
+                                                        : <ChevronUp />
+                                                    }
+                                                
+                                            </Button>
+                                        }
+                                    </div>
                                 }
-                        </div>
+                            </SlideToLeft>
+                        ))
                     }
-                </SlideToLeft>
-            ))
-        }
-    </div>
-   
-)
+                </div>
+            </div>
+            <Button 
+                className={`absolute rounded-none px-5 text-teal-300 hover:text-teal-200 ${ scrollPosition === 'top' ? 'bottom-0 rounded-b-sm' : 'top-0 rounded-t-sm' } justify-between left-0 w-full bg-primary text-base font-thin`}
+                onClick={ handleScroll }
+            >
+                <span>
+                    {
+                        scrollPosition === 'top' 
+                        ? "More Categories"
+                        : "Back to Top"
+                    }
+                </span>
+                    {
+                        scrollPosition === 'top' 
+                        ? <ChevronDown /> 
+                        : <ChevronUp />
+                    }
+                
+            </Button>
+        </div>
+       
+    )
+} 
 
 export const OrderBy = ({
     setter

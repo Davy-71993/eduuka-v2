@@ -43,6 +43,7 @@
     "react-resizable-panels": "^2.0.19",
     "recharts": "^2.12.7",
     "sharp": "^0.33.4",
+    "supabase": "^1.190.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "twilio": "^5.2.2"
