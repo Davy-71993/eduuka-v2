@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
 import { Button } from '../ui/button'
-import { Distance, OrderBy, PriceRange } from '../filtering/Filters'
 import { Category, SubCategory } from '@/lib/types'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -9,6 +8,7 @@ import { NavigationMenuLink } from '../ui/navigation-menu'
 import { useSearch } from '@/lib/hooks'
 import { usePathname } from 'next/navigation'
 import CategoryButton from './CategoryButton'
+import { HomeFiltersContainer } from '../filtering/FilterContainers'
 
 type Props = {
     categories: Category[]
@@ -27,30 +27,12 @@ export default function MobileFilters({ categories }: Props) {
         <ScrollArea className='h-[70vh] w-full'>
             <div className='h-max w-full'>
                 { 
-                    content === 'categories' ? <Categories categories={ categories } /> : <Filters />
+                    content === 'categories' ? <Categories categories={ categories } /> : <HomeFiltersContainer />
                 }
             </div>
         </ScrollArea>
     </div>
   )
-}
-
-const Filters = () => {
-    const [filters, setFilters] = useState<any>()
-    const pathName = usePathname()
-    const queryString = useSearch(filters)
-    return(
-        <div className="flex flex-col gap-5 w-full h-full py-5 rounded-b-sm bg-secondary">
-            <PriceRange setter={ setFilters } />
-            <OrderBy setter={ setFilters } />
-            <Distance setter={ setFilters } />
-            <NavigationMenuLink asChild>
-                <Link href={`${pathName}${queryString}`} className='block w-[90%] mx-auto'>
-                    <Button className='text-xl w-full'>Apply Filters</Button>
-                </Link>
-            </NavigationMenuLink>
-        </div>
-    )
 }
 
 const Categories = ({ categories }: { categories: Category[]}) => {

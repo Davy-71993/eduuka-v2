@@ -12,10 +12,10 @@ export default async function MapPagesLayout({ children }: Props) {
   const categories = await getCategories()
   return (
     <Container clasName='py-5'>
-        <SearchBar />
+        <SearchBar toUrl='/map'/>
         <div className="flex py-5 w-full">
             <div className="w-[25%] min-w-64 h-[75vh] hidden md:flex flex-col gap-5 mb-10">
-              <HomeFiltersContainer colapsble/>
+              <HomeFiltersContainer colapsble toUrl='/map'/>
               <MapCategoryFilter categories={ categories } />
             </div>
             <div className="w-full md:w-[80%] md:px-5 h-full">
