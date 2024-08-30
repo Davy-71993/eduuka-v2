@@ -67,7 +67,7 @@ export const useAds = (cid?: string, scid?: string) => {
   const { geoData } = useContext(AppContext)
   const filters = useFilters()
 
-  const [ads, setAds] = useState<Ad[]>()
+  const [ads, setAds] = useState<Ad[]>([])
   const [loading, startLoading] = useTransition()
 
   useEffect(()=>{
