@@ -4,7 +4,7 @@ import { getProfile } from "@/lib/actions/db_actions";
 import { createClient } from "@/lib/supabase/client";
 import { GeoData, Profile } from "@/lib/types";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { createContext, ReactNode, useCallback, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { reverseCode } from "@/lib/utils";
 
@@ -44,15 +44,16 @@ export default function AppContextProvider({ children }: { children: ReactNode }
             if(error){
                 console.log("Error authenticating, ", error.message)
                 setAppState({...appState, me: null})
-                return
             }
-            console.log("Setting profile")
-            const profile = await getProfile(data.user.id)
-            if(!profile){
-                console.log("Error fetching your profile data.")
-                return
+            if(data.user){
+                console.log("Setting profile")
+                const profile = await getProfile(data.user.id)
+                if(!profile){
+                    console.log("Error fetching your profile data.")
+                }
+                setAppState({...appState, me: profile ?? null })
+
             }
-            setAppState({...appState, me: profile})
             
             if(!appState.geoData){
                 console.log("No cookie, fetching new geo data")
