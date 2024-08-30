@@ -3,17 +3,21 @@ import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
 import { MapContainer, TileLayer } from "react-leaflet"
 import MarkerList from "./MarkerList"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import LoadingDots from "../LoadingDots"
-import { useAds, useGeoData } from "@/lib/hooks"
-import Link from "next/link"
-import { Location } from "@/lib/types"
+import { Ad, Location } from "@/lib/types"
+import { AppContext } from "@/context/Appcontext"
+import AdRoute from "./AdRoute"
 
-export default function MapView() {
+type Props = {
+    ads?: Ad[],
+    ad?: Ad,
+    loading?: boolean
+}
+export default function MapView({ ads, ad, loading }: Props) {
 
     const [center, setCenter] = useState<Location | null>(null)
-    const { ads } = useAds()
-    const geoData = useGeoData()
+    const {geoData} = useContext(AppContext)
 
     useEffect(()=>{
         if(geoData){
@@ -21,27 +25,28 @@ export default function MapView() {
         }
     }, [ads, geoData])
 
-    if(!center){
+    if(!center || loading){
         return (
-            <div className="w-full h-[70vh] border-2 flex justify-center items-center">
+            <div className="w-full rounded-sm h-[75vh] border-2 flex justify-center items-center">
                 <LoadingDots />
             </div>
         )
     }
 
   return (
-    <div className="w-full h-[70vh] relative ">
-        <div className="absolute right-0 bottom-0 w-1/2 min-w-60 py-1 px-10 bg-primary z-[100000] text-center">
-            <h1 className="text-muted text-sm">Maps by <Link href={'https:www.dolinesystems.com'} className="hover:font-bold">Doline Systems</Link></h1>
-        </div>
-        <MapContainer className="h-full w-full relative" center={[center.lat!, center.lon!]} zoom={8} scrollWheelZoom={true}>
+    <div className="w-full h-[75vh] rounded-sm overflow-hidden">
+        <MapContainer className="h-full w-full" center={[center.lat!, center.lon!]} zoom={8} scrollWheelZoom={true}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {
                 ads &&
-                <MarkerList ads={ ads } center={ center } />
+                <MarkerList ads={ ads } center={ center }/>
+            }
+            {
+                ad &&
+                <AdRoute ad={ ad } currency={ geoData?.currency??"USD"} position={ center } />
             }
         </MapContainer>
     </div>

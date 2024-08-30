@@ -7,9 +7,9 @@ import {
     DropdownMenuItem, 
     DropdownMenuLabel, 
     DropdownMenuTrigger 
-} from './ui/dropdown-menu'
-import { Button } from './ui/button'
-import LoadingDots from './LoadingDots'
+} from '../ui/dropdown-menu'
+import { Button } from '../ui/button'
+import LoadingDots from '../LoadingDots'
 import { MenuItem } from '@/lib/types'
 import { fetchMenuItems } from '@/lib/actions/db_actions'
 import { displayCurrencyAndPrice } from '@/lib/utils'

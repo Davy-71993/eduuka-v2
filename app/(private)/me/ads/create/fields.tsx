@@ -27,6 +27,7 @@ type FormGroupProps = {
     className?: string,
     tip?: string,
     required?: boolean,
+    labelClasses?: string
 }
 
 type TipProps = {
@@ -60,12 +61,12 @@ export const Tip = ({ tip, disabled, className }: TipProps) => {
     )
   }
 
-export const FormGroup = ({ children, label, className, tip, required }: FormGroupProps) =>{
+export const FormGroup = ({ children, label, className, tip, required, labelClasses }: FormGroupProps) =>{
     return (
         <div className={cn("w-full max-w-lg mx-auto mt-5 bg-secondary relative border-2 border-primary rounded-sm h-14 sm:h-16", className)}>
             {
                 label &&
-                <Label className='px-3 absolute left-5 sm:text-lg -top-2 max-w-[70%] line-clamp-1 sm:-top-4 text-accent-foreground/50 bg-secondary'>
+                <Label className={`px-3 absolute left-5 sm:text-lg -top-2 max-w-[70%] line-clamp-1 sm:-top-4 text-accent-foreground/50 bg-secondary ${labelClasses}`}>
                     { label }
                     { " " }
                     {

@@ -217,8 +217,8 @@ export const fetchNearbyAds = async(lat?:number, long?:number, filters?: any) =>
         const min_price = numberOrUndefine(filters.mnp)
         const max_price = numberOrUndefine(filters.mxp)
         const mxd = numberOrUndefine(filters.dist)
-        const c_id = numberOrUndefine(filters.cat)
-        const sc_id = numberOrUndefine(filters.subCat)
+        const cid = numberOrUndefine(filters.cid)
+        const scid = numberOrUndefine(filters.scid)
     
         if(min_price){
             query = query.or(`price.gte.${min_price}`)
@@ -237,11 +237,11 @@ export const fetchNearbyAds = async(lat?:number, long?:number, filters?: any) =>
                 nullsFirst: false
             })
         }
-        if(c_id){
-            query = query.eq('category_id', c_id)
+        if(cid){
+            query = query.eq('category_id', cid)
         }
-        if(sc_id){
-            query = query.eq('sub_category_id', sc_id)
+        if(scid){
+            query = query.eq('sub_category_id', scid)
         }
     }
 

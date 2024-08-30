@@ -8,7 +8,7 @@ import React from 'react'
 import ProfileCard from './(parts)/ProfileCard'
 import ImageWithFallbackUrl from '@/components/ImageWithFallbackUrl'
 import SimilarAdsList from '@/components/ads/SimilarAdsList'
-import PricePanel from '@/components/PricePanel'
+import PricePanel from '@/components/pricing/PricePanel'
 
 
 export async function generateMetadata({ params: { aid } }: { params: any}) {
@@ -32,7 +32,7 @@ type Props = {
   searchParams: any
 }
 
-export default async function page({ params, searchParams }: Props) {
+export default async function AdPage({ params, searchParams }: Props) {
   const aid = params.aid
   const ad = await getAdByID(aid)
   

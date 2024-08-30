@@ -1,9 +1,13 @@
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Message } from "./types"
+import { GeoData, Location, Message } from "./types"
 import { MdElectricalServices } from "react-icons/md";
 import { ComponentType } from "react";
+import { LatLng } from "leaflet";
+import axios from "axios";
+import { SUPPORTED_CURRANCIES } from "./defaults";
+import { useFilters, useSearch } from "./hooks";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -60,7 +64,6 @@ export const displayCurrencyAndPrice = (ad_currency: string, currency: string, p
   return `${currency} ${toMoney(((toNumber(price)/exchangeRate[ad_currency])*exchangeRate[currency]).toFixed(2))}`
 
 }
-
 
 /**
  * Get messages and structure then into folders, depending on the ads and other participants
@@ -150,14 +153,83 @@ export const toMoney = (money: string) => {
   return bc+res
 }
 
-export const categoriesIcons: {
-  slug: string,
-  Icon: ComponentType
-}[] = [
-  {
-    slug: 'electronics',
-    Icon: MdElectricalServices
+/**
+ * Do reverse geo-coding given the coordinates
+ */
+export const reverseCode = async(location: Location) => {
+  try {
+    const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${location.lat}&lon=${location.lon}`)
+    const { address, display_name } = res.data
+    const locationData: GeoData = {
+      ...address,
+      address: display_name,
+      currency: SUPPORTED_CURRANCIES[address.country_code.toUpperCase()] ?? 'USD',
+      location
+    }
+
+    return locationData       
+  } catch (error) {
+    console.log("Failed to reverse geo-code, ", error)
+    
+    return 
   }
-]
+}
+
+/**
+ * Calculate geo distance between two points
+ */
+export const calcDistance = (point1:Location, point2: Location, unit?: string) => {
+  let lat1 = point1.lat,
+      lat2 = point2.lat,
+      lon1 = point1.lon,
+      lon2 = point2.lon
+
+  if(!lat1 || !lat2 || !lon1 || !lon2){
+    return
+  }
+
+	if ((lat1 == lat2) && (lon1 == lon2)) {
+		return 0;
+	}
+	else {
+		let radlat1 = Math.PI * lat1/180;
+		let radlat2 = Math.PI * lat2/180;
+		let theta = lon1-lon2;
+		let radtheta = Math.PI * theta/180;
+		let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+		if (dist > 1) {
+			dist = 1;
+		}
+		dist = Math.acos(dist);
+		dist = dist * 180/Math.PI;
+		dist = dist * 60 * 1.1515;
+		if (unit=="K") { dist = dist * 1.609344 }
+		if (unit=="N") { dist = dist * 0.8684 }
+		return dist;
+	}
+}
+
+/**
+ * Convert the search params into an object
+ */
+export const toQueryString = (obj: any) => {
+  // Initialize the queryString with a ?
+  let queryString = '?'
+  // For evey item in th updated search params object,
+  // update the queryString
+  for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          if(obj[key]){
+              queryString+=`${key}=${obj[key]}&`;
+          }
+      }
+  }
+  
+  // We ensure we have removed the last character in the string
+  // From the above definitions, it's either ? or &
+  queryString = queryString.slice(0, queryString.length-1)
+
+  return queryString
+}
 
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { FormGroup, FormRadioGroup, FormSelect, MenuPriceItem, Tip } from '../fields'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -10,14 +10,14 @@ import { numberOrUndefine, toNumber } from '@/lib/utils'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import { useGeoData } from '@/lib/hooks'
+import { AppContext } from '@/context/Appcontext'
 
 type Props = {}
 
 export default function StepThree({}: Props) {
 
   const router = useRouter()
-  const geoData = useGeoData()
+  const { geoData } = useContext(AppContext)
   // Form data initially set by data from the localstrage
   const [data, setData] = useState<AdData>()
   const [menuItem, setMenuItem] = useState<MenuItem>()

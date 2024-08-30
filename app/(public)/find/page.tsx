@@ -26,7 +26,7 @@ export default async function FindPage() {
 
         {/* Filters */}
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col gap-5 mb-10">
-          <HomeFiltersContainer />
+          <HomeFiltersContainer colapsble/>
           <DesktopCategories categories={ categories } />
         </div>
         

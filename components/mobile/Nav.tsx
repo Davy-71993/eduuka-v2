@@ -100,7 +100,7 @@ export default function Nav({ categories }: Props) {
                 <NavigationMenuTrigger className='hover:bg-background hover:text-primary border-2 border-background rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <Menu/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-[90vw] max-w-96'>
+                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-[90vw] max-w-80'>
                     {
                         pathname.startsWith('/me')?(
                             <>

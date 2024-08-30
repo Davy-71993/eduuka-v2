@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { useParams } from 'next/navigation'
 import { AppContext } from '@/context/Appcontext'
@@ -19,7 +19,7 @@ export default function ActionButtons({ phone, ad_seller }: Props) {
 
     const { chatHeads, setState, me } = useContext(AppContext)
 
-    const updateChatString = () => {
+    const updateChatString = useCallback(() => {
         if(!me || me.id === ad_seller){
             console.log("You are trying to start a conversation with yourself, which is imposible.")
             return
@@ -32,7 +32,7 @@ export default function ActionButtons({ phone, ad_seller }: Props) {
             key: "chatHeads",
             value: [...chatHeads??[], newChatHead]
         })
-    }
+    }, [me, ad_seller, ad_id, chatHeads, setState])
     
     if(!ad_id){
         return null
