@@ -1,21 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
 import { Button } from '../ui/button'
 import { Category, SubCategory } from '@/lib/types'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { NavigationMenuLink } from '../ui/navigation-menu'
-import { useSearch } from '@/lib/hooks'
 import { usePathname } from 'next/navigation'
 import CategoryButton from './CategoryButton'
-import { HomeFiltersContainer } from '../filtering/FilterContainers'
+import { HomeFiltersContainer, MapCategoryFilter } from '../filtering/FilterContainers'
 
 type Props = {
     categories: Category[]
 }
 
 export default function MobileFilters({ categories }: Props) {
-    
+    const pathName = usePathname()
     const [content, setContent] = useState('categories')
   return (
     <div className="flex flex-col h-full w-full">
@@ -27,7 +26,11 @@ export default function MobileFilters({ categories }: Props) {
         <ScrollArea className='h-[70vh] w-full'>
             <div className='h-max w-full'>
                 { 
-                    content === 'categories' ? <Categories categories={ categories } /> : <HomeFiltersContainer />
+                    content === 'categories' 
+                    ? pathName.includes('map')
+                    ? <MapCategoryFilter categories={ categories } mobile /> 
+                    :<Categories categories={ categories } /> 
+                    : <HomeFiltersContainer />
                 }
             </div>
         </ScrollArea>

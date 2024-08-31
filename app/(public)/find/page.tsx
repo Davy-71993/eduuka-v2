@@ -1,4 +1,5 @@
 import AdsList from "@/components/ads/AdsList"
+import FloatingComponent from "@/components/animated/FloatingComponent"
 import Container from "@/components/Container"
 import { HomeFiltersContainer } from "@/components/filtering/FilterContainers"
 import { DesktopCategories } from "@/components/filtering/Filters"
@@ -20,14 +21,19 @@ export default async function FindPage() {
   const stores = await fetchStores()
   
   return (
-    <Container clasName="pt-5">
-      <SearchBar includeLocation />
-      <div className="flex py-5 w-full">
-
+    <Container clasName="">
+      <div className="fixed w-full max-w-[90rem] z-[60] bg-background -mt-5 pb-3 pt-5">
+        <SearchBar includeLocation />
+      </div>
+      <div className="flex py-16 w-full">
         {/* Filters */}
-        <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col gap-5 mb-10">
-          <HomeFiltersContainer colapsble/>
-          <DesktopCategories categories={ categories } />
+        <div className="w-[25%] relative hidden md:flex">
+          <FloatingComponent>
+            <div className="flex flex-col gap-5">
+              <HomeFiltersContainer colapsble/>
+              <DesktopCategories categories={ categories } />
+            </div>
+          </FloatingComponent>
         </div>
         
         <div className="w-full md:w-[80%] flex flex-col gap-5 md:px-5 overflow-hidden">

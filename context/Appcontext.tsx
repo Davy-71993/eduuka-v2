@@ -7,6 +7,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { reverseCode } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 type AppState = {
     me: Profile | null,
@@ -14,7 +15,7 @@ type AppState = {
     chatHeads?: string[],
     activeChatHead?: string,
     setState: (newState: any) => void,
-    geoData?: GeoData
+    geoData?: GeoData,
 }
 
 const defaultValue: AppState = {
@@ -33,6 +34,8 @@ const defaultValue: AppState = {
 export const AppContext = createContext(defaultValue)
 
 export default function AppContextProvider({ children }: { children: ReactNode }){
+
+    const pathName = usePathname()
     
     const supabase = createClient()
     const [appState, setAppState] = useState<AppState>(defaultValue)
@@ -110,6 +113,7 @@ export default function AppContextProvider({ children }: { children: ReactNode }
             }
             
         })()
+        
     }, [])
 
     useEffect(()=>{
@@ -117,6 +121,37 @@ export default function AppContextProvider({ children }: { children: ReactNode }
         console.log("Updating geo cookie")
         Cookies.set('geo', JSON.stringify(appState.geoData))
     }, [appState.geoData])
+
+    useEffect(()=>{
+        const target = document.querySelector('#footer')
+        const pane = document.querySelector('#sidePane')
+        if(!pane){
+            return
+        }
+        const observer = new IntersectionObserver((entries, obs)=>{
+            const targetEntry = entries[0]
+            if(targetEntry.isIntersecting){
+                pane.classList.replace('fixed', 'absolute')
+                pane.classList.add('bottom-0', 'left-0')
+            }else{
+                pane.classList.replace('absolute', 'fixed')
+                pane.classList.remove('bottom-0', 'left-0')
+            }
+        }, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        })
+        if(!target){
+            return
+        }
+        observer.observe(target)
+    
+        return ()=>{
+            observer.unobserve(target)
+            observer.disconnect()
+        }
+    }, [pathName])
 
     return (
         <AppContext.Provider value={ {
