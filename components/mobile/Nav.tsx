@@ -53,7 +53,7 @@ export default function Nav({ categories }: Props) {
                 <NavigationMenuTrigger className='hover:bg-primary-foreground hover:text-primary border-2 border-primary-foreground rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <User/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col w-full self-center p-5'>
+                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-[90vw] max-w-80'>
                     {
                         authenticated ?
                             <>

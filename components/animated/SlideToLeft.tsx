@@ -37,15 +37,16 @@ export default function SlideToLeft({ title, children, className, onOpen }: Prop
     }, [onOpen])
     
     return (
-        <div onMouseEnter={ handleOpen } onMouseLeave={ handleClose } className="w-full">
-            <div className={`px-5 py-1 transition-colors flex justify-between text-muted text-lg w-full items-center cursor-pointer ${ !hidden && 'bg-primary'} ${ className }`}>
+        <div onMouseEnter={ handleOpen } onMouseLeave={ handleClose } className="w-full px-2">
+            <div className={`px-5 py-1 text-lg transition-colors line-clamp-1 rounded-sm hover:bg-primary-foreground hover:text-primary flex justify-between items-center cursor-pointer ${ !hidden ? 'bg-primary-foreground text-primary' : 'text-primary-foreground'} ${ className }`}>
+                
                 <p className='line-clamp-1'>{ title }</p>
                 {
                     !hidden &&
                     <ChevronRight />
                 }
             </div>
-            <div ref={ subRef } className={`${ hidden } h-[65vh] overflow-hidden bg-primary/95 rounded-r-sm absolute top-0 opacity-0 slide-in z-40`}>
+            <div ref={ subRef } className={`${ hidden } h-[70vh] w-full overflow-hidden bg-primary/95 rounded-r-sm absolute top-0 opacity-0 slide-in z-40`}>
                 { children }
             </div>
         </div>

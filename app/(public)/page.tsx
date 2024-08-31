@@ -19,6 +19,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { fetchStores, getCategories } from "@/lib/actions/db_actions"
 import Link from "next/link"
 import { Metadata } from 'next';
+import FloatingComponent from "@/components/animated/FloatingComponent"
 
 
 export const metadata: Metadata = {
@@ -32,14 +33,19 @@ export default async function Home() {
   const stores = await fetchStores()
  
   return (
-    <Container clasName="pt-5">
-      <SearchBar includeLocation />
-      <div className="flex py-5 w-full">
-
+    <Container clasName="">
+      <div className="fixed w-full max-w-[90rem] z-[60] bg-background -mt-5 pb-3 pt-5">
+        <SearchBar includeLocation />
+      </div>
+      <div className="flex py-16 w-full">
         {/* Filters */}
-        <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col gap-5 mb-10">
-          <HomeFiltersContainer colapsble/>
-          <DesktopCategories categories={ categories } />
+        <div className="w-[25%] min-w-64 relative hidden md:block">
+          <FloatingComponent>
+            <div className="flex flex-col gap-5">
+              <HomeFiltersContainer colapsble/>
+              <DesktopCategories categories={ categories } />
+            </div>
+          </FloatingComponent>
         </div>
         
         <div className="w-full md:w-[80%] flex flex-col gap-5 md:px-5 overflow-hidden">

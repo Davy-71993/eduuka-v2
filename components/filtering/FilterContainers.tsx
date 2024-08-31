@@ -2,7 +2,7 @@
 
 import { Button } from '../ui/button'
 import { usePathname, useRouter } from 'next/navigation'
-import { ChevronDown, ChevronLeft, CircleAlert } from 'lucide-react'
+import { ChevronDown, ChevronLeft } from 'lucide-react'
 import { useFilters } from '@/lib/hooks'
 import Link from 'next/link'
 import { ScrollArea } from '../ui/scroll-area'
@@ -16,6 +16,7 @@ import { AppContext } from '@/context/Appcontext'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Label } from '../ui/label'
+import { NavigationMenuLink } from '../ui/navigation-menu'
 
 type Props = {
   colapsble?: boolean,
@@ -236,7 +237,7 @@ export  const  HomeFiltersContainer = ({ colapsble=false, toUrl }: Props) => {
   )
 }
 
-export const MapCategoryFilter = ({ categories }: { categories: Category[] }) => {
+export const MapCategoryFilter = ({ categories, mobile }: { categories: Category[], mobile?:boolean }) => {
   
   const [selectedCategory, setSelectedCategory] = useState<Category>()
   const [subCategories, setSubCategories] = useState<SubCategory[]>()
@@ -278,21 +279,37 @@ export const MapCategoryFilter = ({ categories }: { categories: Category[] }) =>
                   <Link href={`/map`} className='w-fit hover:bg-background h-full py-1 px-3'>
                       <ChevronLeft size={28} />
                   </Link>
-                  <Link  
-                    href={`/map${toQueryString({...params, cid: selectedCategory.id, scid: undefined})}`}
-                    className='w-full line-clamp-1 py-1 px-3 text-primary text-left hover:bg-background'
-                  >
-                    { selectedCategory.name }
-                  </Link>
+                  {
+                    mobile 
+                    ?(
+                      <NavigationMenuLink asChild>
+                        <Link  
+                          href={`/map${toQueryString({...params, cid: selectedCategory.id, scid: undefined})}`}
+                          className='w-full line-clamp-1 py-1 px-3 text-primary text-left hover:bg-background'
+                        >
+                          { selectedCategory.name }
+                        </Link>
+                      </NavigationMenuLink>
+                    )
+                    :(
+                      <Link  
+                        href={`/map${toQueryString({...params, cid: selectedCategory.id, scid: undefined})}`}
+                        className='w-full line-clamp-1 py-1 px-3 text-primary text-left hover:bg-background'
+                      >
+                        { selectedCategory.name }
+                      </Link>
+                    )
+                  }
+                  
                 </div>
                 {
                   subCategories?.map((subCategory, index) => (
-                    <Link key={ index } href={`/map${toQueryString({...params, scid: subCategory.id})}`}>
-                      <p 
-                        className={`w-full line-clamp-1 rounded px-2 py-1 text-lg text-muted hover:bg-background hover:text-primary ${ selectedSubCategory === subCategory && 'bg-background text-primary'}`}>
-                        { subCategory.name }
-                      </p>
-                    </Link>
+                    <SubCategoryLink 
+                      key={index}
+                      mobile={mobile} 
+                      name={ subCategory.name! } 
+                      selected={selectedSubCategory === subCategory}
+                      to={`/map${toQueryString({...params, cid: selectedCategory.id, scid: subCategory.id})}`}/>
                   ))
                 }
               </div>
@@ -301,5 +318,28 @@ export const MapCategoryFilter = ({ categories }: { categories: Category[] }) =>
         </div>
       </ScrollArea>
     </div>
+  )
+}
+
+const SubCategoryLink = ({mobile, to, name, selected}: {mobile?:boolean, to:string, name: string, selected?:boolean}) => {
+  if(mobile){
+    return(
+      <NavigationMenuLink asChild>
+        <Link href={to}>
+          <p 
+            className={`w-full line-clamp-1 rounded px-2 py-1 text-lg text-muted hover:bg-background hover:text-primary ${ selected && 'bg-background text-primary'}`}>
+            { name }
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    )
+  }
+  return (
+    <Link href={to}>
+      <p 
+        className={`w-full line-clamp-1 rounded px-2 py-1 text-lg text-muted hover:bg-background hover:text-primary ${ selected && 'bg-background text-primary'}`}>
+        { name }
+      </p>
+    </Link>
   )
 }
