@@ -34,8 +34,10 @@ export default async function Home() {
  
   return (
     <Container clasName="">
-      <div className="fixed w-full max-w-[90rem] z-[60] bg-background -mt-5 pb-3 pt-5">
-        <SearchBar includeLocation />
+      <div className="fixed bg-background w-full z-[60] left-0 flex justify-center -mt-5 pb-3 pt-5">
+        <Container>
+          <SearchBar includeLocation />
+        </Container>
       </div>
       <div className="flex py-16 w-full">
         {/* Filters */}
@@ -48,7 +50,7 @@ export default async function Home() {
           </FloatingComponent>
         </div>
         
-        <div className="w-full md:w-[80%] flex flex-col gap-5 md:px-5 overflow-hidden">
+        <div className="w-full md:w-[80%] flex flex-col gap-5 md:pl-5 overflow-hidden">
           {/* Display popular stores in a horizontal scroll */}
           {
             stores.length > 0 &&
