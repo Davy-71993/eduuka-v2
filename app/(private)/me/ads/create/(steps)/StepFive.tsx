@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { CDN_URL } from '@/lib/defaults'
 import { uploadAd } from '@/lib/actions/db_actions'
 import LoadingDots from '@/components/LoadingDots'
+import { toNumber } from '@/lib/utils'
 
 type Props = {}
 
@@ -19,7 +20,7 @@ export default function StepFive({}: Props) {
   const router = useRouter()
 
   const [data, setData] = useState<AdData>()
-  const [error, setError] = useState<string[]>([])
+  const [error, setError] = useState<string>()
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>()
   const [uploading, startUploading] = useTransition()
 
@@ -33,14 +34,12 @@ export default function StepFive({}: Props) {
   }, [router])
 
   
-  const validateData = useCallback(() => {
+  const validateImageFiles = () => {
     const files = data?.imageFiles
-    !files || files.length < 2 
-    ? setError([...error, "You must upload at least two image files."])
-    : setError([]);
-  }, [data?.imageFiles, error])
-
-  useEffect(()=>{validateData()}, [validateData, data])
+    if(!files || files.length < 2){
+      return "You must upload at least two image files."
+    } 
+  }
 
   const convertImageToString = (file: File) => {
     const fileReader = new FileReader();
@@ -62,9 +61,10 @@ export default function StepFive({}: Props) {
 
   const handleSubmit =() => {
     startUploading(async()=>{
-
-        if(error.length){
-          console.log(`You have ${data?.imageFiles?.length} images.\n`, error)
+      const imageFilesError = validateImageFiles()
+        if(imageFilesError){
+          console.log(`You have ${ toNumber(data?.imageFiles?.length)} images.`, imageFilesError)
+          setError(`You have ${toNumber(data?.imageFiles?.length)} images. ${ imageFilesError }`)
           return
         }
     
@@ -88,7 +88,7 @@ export default function StepFive({}: Props) {
     
         const newAd = await uploadAd(ad)
         if(!newAd){
-          setError([...error, "Sory, we could not upload your ad."])
+          setError("Sory, we could not upload your ad.")
           return
         }
         const supabase = createClient()
@@ -106,6 +106,7 @@ export default function StepFive({}: Props) {
         })
 
         localStorage.removeItem("ad_data")
+        router.push(`/me/ads`)
     })
   }
 
@@ -113,7 +114,7 @@ export default function StepFive({}: Props) {
     <>
       {
         error &&
-        <p className="text-center w-fit mx-auto max-w-lg text-lg text-red-600">{ error.join(', ') }</p>
+        <p className="text-center w-fit mx-auto max-w-lg text-lg text-red-600">{ error }</p>
       }
       <div className="h-fit w-full static py-3">
         <div id='images-container' className="flex flex-wrap w-full p-3 gap-5 h-fit border-2 border-dashed border-primary rounded-sm">
@@ -146,23 +147,23 @@ export default function StepFive({}: Props) {
             : 
               <div className="h-fit w-full py-5 flex flex-col gap-3 justify-center items-center text-muted-foreground">
                 <CloudUpload size={60} />
-                <span>Drag and drop Images here to upload</span>
+                <span>Upload Images of your ad here</span>
+                <Button onClick={()=>{ document.getElementById('file-selector')?.click()}} 
+                  className='bg-muted-foreground flex space-x-3 font-bold hover:bg-muted-foreground/80'>
+                  <CloudUpload /><span>Upload Images</span>
+                </Button>
+                <Input type='file' accept='image/*' id='file-selector' className='hidden' onChange={(e)=>{ handleNewFiles(e.target.files as unknown as File[]) }} multiple/>
               </div>
           }
         </div>
       </div>
       
-      <Button onClick={()=>{ document.getElementById('file-selector')?.click()}} 
-        className='bg-muted-foreground flex space-x-3 font-bold hover:bg-muted-foreground/80'>
-        <CloudUpload /><span>Upload Images</span>
-      </Button>
-      <Input type='file' accept='image/*' id='file-selector' className='hidden' onChange={(e)=>{ handleNewFiles(e.target.files as unknown as File[]) }} multiple/>
       
-      <div className="flex justify-between items-center py-3 w-full">
-        <Link href="?cp=4"><Button><ArrowBigLeft />Prevous Page</Button></Link>
+      <div className="flex gap-3 justify-between items-center py-3 w-full">
+        <Link href="?cp=4" className='w-full'><Button className='w-full max-w-72 px-2'><ArrowBigLeft />Prevous Page</Button></Link>
         <Button 
           disabled = { uploading }
-          className='bg-green-600'
+          className='bg-green-600 hover:bg-green-500 w-full max-w-96 px-2'
           onClick={ handleSubmit }>{ uploading ? <>Uploading <LoadingDots /></> : (<>Post Ad<ArrowBigRight /></>)}</Button>
       </div>
     </>

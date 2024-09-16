@@ -142,7 +142,10 @@ export const createAdImage = async(image: AdImage) => {
 
 export const getUserAds = async() => {
     const supabase = createClient(cookies())
-    const { data, error } = await supabase.from('user_ads').select()
+    const { data, error } = await supabase
+        .from('user_ads')
+        .select('*')
+        .is('trashed_at', null)
     if(error){
         console.log("An error occured while fetching user ads. ", error.message)
         return []
@@ -153,7 +156,12 @@ export const getUserAds = async() => {
 
 export const getAdByID = async(id: string) => {
     const supabase = createClient(cookies())
-    const { data, error } = await supabase.from('ads').select('*, profiles(first_name, last_name, image, phone), ad_images(url), menu_items(item, price)').eq('id', id).single()
+    const { data, error } = await supabase
+        .from('ads')
+        .select('*, profiles(first_name, last_name, image, phone), ad_images(url, deleted_at), menu_items(id, item, price), categories(id, name), sub_categories(id, name, category_id)')
+        .eq('id', id)
+        .is('trashed_at', null)
+        .single()
 
     if(error) return
     return data as Ad
@@ -161,7 +169,11 @@ export const getAdByID = async(id: string) => {
 
 export const getStoreAds = async(storeID: string) => {
     const supabase = createClient(cookies())
-    const { data, error } = await supabase.from('ads_with_image_url').select().eq('store_id', storeID)
+    const { data, error } = await supabase
+        .from('ads_with_image_url')
+        .select('*')
+        .is('trashed_at', null)
+        .eq('store_id', storeID)
     if(error){
         console.log("An error occured while fetching store ads. ", error.message)
         return []
@@ -173,7 +185,10 @@ export const getStoreAds = async(storeID: string) => {
 export const getSimilarAds = async(lat: number, long: number, ad_id?:string, cat_id?: number, sub_cat_id?: string) => {
     
     const supabase = createClient(cookies())
-    let query = supabase.rpc('get_nearby_ads', { lat, long, }).neq('id', ad_id)
+    let query = supabase
+        .rpc('get_nearby_ads', { lat, long, })
+        .neq('id', ad_id)
+        .is('trashed_at', null)
     if(cat_id){
         query = query.or(`category_id.eq.${cat_id}`)
     }
@@ -202,12 +217,17 @@ export const fetchNearbyAds = async(lat?:number, long?:number, filters?: any) =>
 
     let query;
     if(lat && long){
-        query = supabase.rpc('get_nearby_ads', {
-            lat,
-            long,
-        })
+        query = supabase
+            .rpc('get_nearby_ads', {
+                lat,
+                long,
+            })
+            .is('trashed_at', null)
     }else{
-        query = supabase.from('ads_with_image_url').select('*')
+        query = supabase
+            .from('ads_with_image_url')
+            .select('*')
+            .is('trashed_at', null)
     }
 
     if(filters){

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useContext, useEffect, useState } from 'react'
 
 import {
     ResizableHandle,
@@ -13,7 +13,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { DASHBOARD_LINKS } from '@/lib/defaults'
 import LinkItem from './LinkItem'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { getProfile } from '@/lib/actions/db_actions'
+import { AppContext } from '@/context/Appcontext'
+import { ScrollArea } from '@/components/ui/scroll-area'
   
 
 type Props = {
@@ -29,14 +30,14 @@ export default function DashboardLayout({ children }: Props) {
     
     const pathname = usePathname()
     const router = useRouter()
+
+    const { me, loading } = useContext(AppContext)
     useEffect(()=>{
-      (async()=>{
-       const profile = await getProfile()
-       if(!profile){
-           return router.push('/me/create-profile')
-       }
-      })()     
-   }, [pathname, router])
+        if(!me && !loading){
+            return router.push('/me/create-profile')
+        }    
+      
+   }, [pathname, router, me, loading])
     const title = DASHBOARD_LINKS.find(link => link.url === pathname)?.title
     const setPanelSize = (size: number, changeSize: number) => {
         const panel = document.querySelector('.nav-panel')
@@ -108,7 +109,7 @@ export default function DashboardLayout({ children }: Props) {
                 </div>
             </ResizablePanel>
             <ResizableHandle className='border-r-2 border-secondary hidden md:block' />
-            <ResizablePanel className='page-panel w-full' defaultSize={75} minSize={ 70 }>
+            <ResizablePanel className='page-panel w-full md:pl-5' defaultSize={75} minSize={ 70 }>
                 <div className="px-2 sm:px-5  h-16 flex justify-end sm:justify-between items-center bg-secondary">
                     <h1 className='hidden sm:block uppercase font-bold text-2xl text-primary'>{ title }</h1>
                     {
@@ -116,7 +117,13 @@ export default function DashboardLayout({ children }: Props) {
                         <Button variant={'outline'} className='text-primary'>{ dateTime?.date + " " + dateTime?.time }</Button>
                     }
                 </div>
-                { children }
+                {/* <div className="p-5 bg-secondary w-full">
+                    <ScrollArea className='h-[75vh] w-full'>
+                        <div className="w-full h-max"> */}
+                            { children }
+                        {/* </div>
+                    </ScrollArea>
+                </div> */}
             </ResizablePanel>
         </ResizablePanelGroup>
     </Container>

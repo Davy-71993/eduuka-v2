@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ArrowBigLeft, ArrowBigRight } from 'lucide-react'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FormGroup, RenderExtraFields } from '../fields'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -39,7 +39,7 @@ export default function StepTwo({}: Props) {
   const navigateToNextPage = () => {
    
     if(!description || description === '' || !name || name === ''){
-       setErrors('Please fill all the required fields')
+       setErrors('Please make sure you have provided the name and the description of your ad.')
        return
     }
 
@@ -54,9 +54,15 @@ export default function StepTwo({}: Props) {
     router.push('?cp=3')
   }
 
+  const handleExtraDetails = useCallback((value: string) => { setDetails(value) }, [])
+
 
   return (
     <>
+    {
+      errors &&
+      <p className='text-xl text-destructive w- max-w-xl mx-auto text-center'>{ errors }</p>
+    }
       <FormGroup label="Name or Title" required>
           <Input className='w-full absolute bg-secondary left-0 bottom-0 h-12 text-lg px-8' value={name} onChange={(e)=>{ setName(e.target.value)}} />
       </FormGroup>
@@ -69,7 +75,7 @@ export default function StepTwo({}: Props) {
       {
         data?.sub_category?.extra_fields &&
         <RenderExtraFields
-          setter={ (value) => { setDetails(value) } } 
+          setter={ handleExtraDetails } 
           fields={ data?.sub_category.extra_fields ?? '' }
           initialData={ deatils } />
       } 

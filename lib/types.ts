@@ -59,7 +59,7 @@ export type Ad = {
     store_id?: string
     dist_meters?: number
     views?: number
-    trashed_at?: string
+    trashed_at?: Date
     ad_details?: string
     lat?: string
     long?: string
@@ -69,7 +69,7 @@ export type Ad = {
     min_price?: number,
     max_price?: number,
     address?: string,
-    deleted_at?: string,
+    deleted_at?: Date,
     pricing_period?: string, // "Hourly" | "Weekly" | "Monthly" | "Quaterly" | "Yearly"
     sub_category?: SubCategory
     ad_images?: AdImage[],
@@ -81,7 +81,8 @@ export type Ad = {
 }
 
 export type MenuItem = {
-    item?: string,
+    id?: string
+    item?: string
     price?: string 
 }
 
@@ -94,6 +95,8 @@ export type Menu = {
 export interface AdData extends Ad {
     category?: Category,
     imageFiles?: File[]
+    categories?: Category
+    sub_categories?: SubCategory
 }
 
 export type Message = {

@@ -1,13 +1,33 @@
 
 import React from 'react'
 import AdsTable from './Table'
-import { getUserAds } from '@/lib/actions/db_actions'
+import { getAdByID, getUserAds } from '@/lib/actions/db_actions'
+import { Ad } from '@/lib/types'
+import AdEditForm from './(ad-edit)/AdEditForm'
+import { MdErrorOutline } from 'react-icons/md'
 
-export default async function AdPage() {
+type Props = {
+  searchParams: any
+}
+export default async function AdPage({ searchParams }: Props) {
   const ads = await getUserAds()
+  const aid = searchParams['aid']
+  let ad: Ad | undefined;
+  ad = await getAdByID(aid)
   return (
-    <div className='p-5'>
-        <AdsTable ads={ ads.slice(0, 5) } />
-    </div>
+    <>
+      {
+        aid
+        ? ad 
+        ? <AdEditForm ad={ {...ad, ad_images: ad.ad_images?.filter((img: any) => !img["deleted_at"])} } /> 
+        : (
+            <div className='flex flex-col gap-5 justify-center items-center h-80 w-full text-2xl text-destructive'>
+              <MdErrorOutline size={100}/>
+              <p className='text-muted-foreground'>Error, invalid Ad id.</p>
+            </div>
+          )
+        :<AdsTable ads={ ads } />
+      }
+    </>
   )
 }

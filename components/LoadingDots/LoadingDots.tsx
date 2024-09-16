@@ -1,11 +1,14 @@
 import s from './LoadingDots.module.css';
 
-const LoadingDots = () => {
+type Props ={
+  className?: string
+}
+const LoadingDots = ({ className}: Props) => {
   return (
     <span className={`${s.root} ml-3`}>
-      <span />
-      <span />
-      <span />
+      <span className={`${className} bg-zinc-700`}/>
+      <span className={`${className} bg-zinc-700`}/>
+      <span className={`${className} bg-zinc-700`}/>
     </span>
   );
 };
