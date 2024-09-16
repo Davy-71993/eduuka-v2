@@ -10,16 +10,18 @@ import { reverseCode } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
 type AppState = {
-    me: Profile | null,
+    me: Profile | null
     supabase?: SupabaseClient
-    chatHeads?: string[],
-    activeChatHead?: string,
-    setState: (newState: any) => void,
-    geoData?: GeoData,
+    loading: boolean
+    chatHeads?: string[]
+    activeChatHead?: string
+    setState: (newState: any) => void
+    geoData?: GeoData
 }
 
 const defaultValue: AppState = {
     me: null,
+    loading: true,
     setState: () => {},
     geoData: (() =>{
         console.log("Getting geo data")
@@ -43,10 +45,11 @@ export default function AppContextProvider({ children }: { children: ReactNode }
     useEffect(()=>{
         (async()=>{
             console.log("Updating Global state")
+            setAppState({...appState, loading: true})
             const { data, error } = await supabase.auth.getUser()
             if(error){
                 console.log("Error authenticating, ", error.message)
-                setAppState({...appState, me: null})
+                setAppState({ ...appState, me: null, loading: false })
             }
             if(data.user){
                 console.log("Setting profile")
@@ -54,7 +57,7 @@ export default function AppContextProvider({ children }: { children: ReactNode }
                 if(!profile){
                     console.log("Error fetching your profile data.")
                 }
-                setAppState({...appState, me: profile ?? null })
+                setAppState({ ...appState, me: profile ?? null, loading: false })
 
             }
             
@@ -72,10 +75,10 @@ export default function AppContextProvider({ children }: { children: ReactNode }
 
                         console.log("Setting new geo data")
                         if(data){
-                            setAppState({...appState, geoData: data})
+                            setAppState({...appState, geoData: data, loading: false })
                         }else{
                             console.log("Reverse coding failed, setting default geo data")
-                            setAppState({...appState, geoData: {
+                            setAppState({...appState, loading: false, geoData: {
                                 city: '',
                                 country: '',
                                 currency: 'USD',
@@ -91,7 +94,7 @@ export default function AppContextProvider({ children }: { children: ReactNode }
                     }, (error)=>{
                         // Modify the reverseCode function to alternatively get the location even without the coordinates
                         console.log("The Navigator failed to get your current location. ", error.message)
-                        setAppState({...appState, geoData: {
+                        setAppState({...appState, loading: false, geoData: {
                             city: '',
                             country: '',
                             currency: 'USD',
@@ -102,7 +105,7 @@ export default function AppContextProvider({ children }: { children: ReactNode }
                 }else{
                     // Modify the reverseCode function to alternatively get the location even without the coordinates
                     console.log("Your device can not get your current location.")
-                    setAppState({...appState, geoData: {
+                    setAppState({...appState, loading: false, geoData: {
                         city: '',
                         country: '',
                         currency: 'USD',

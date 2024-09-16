@@ -53,7 +53,7 @@ export default function Nav({ categories }: Props) {
                 <NavigationMenuTrigger className='hover:bg-primary-foreground hover:text-primary border-2 border-primary-foreground rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <User/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-[90vw] max-w-80'>
+                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-full min-w-80 p-5'>
                     {
                         authenticated ?
                             <>
@@ -100,14 +100,14 @@ export default function Nav({ categories }: Props) {
                 <NavigationMenuTrigger className='hover:bg-background hover:text-primary border-2 border-background rounded-full h-10 w-10 sm:h-12 sm:w-12 sm:text-2xl font-bold'>
                     <Menu/>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-[90vw] max-w-80'>
+                <NavigationMenuContent className='flex flex-col h-fit max-h-[80vh] w-full min-w-80'>
                     {
                         pathname.startsWith('/me')?(
                             <>
                             <div className="flex flex-col gap-1 p-3">
                                 {
                                     DASHBOARD_LINKS.map((link, index)=>(
-                                        <NavigationMenuLink key={index} >
+                                        <NavigationMenuLink asChild key={index} >
                                             <MobileLinkItem href={link.url} name={link.display_name} Icon={link.icon}/>
                                         </NavigationMenuLink>
                                                 

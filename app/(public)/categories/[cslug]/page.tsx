@@ -38,7 +38,7 @@ export default async function page({ params }: Props) {
   return (
     <Container clasName='pt-5'>
       <SearchBar />
-      <div className="flex mt-5 sm:mt-10 sm:space-x-5">
+      <div className="flex mt-5 sm:mt-10 sm:gap-5">
         <div className="w-[25%] min-w-64 h-fit hidden md:flex flex-col space-y-5 mb-10">
           {/* Render the filter panel here. */}
           <HomeFiltersContainer />
@@ -46,7 +46,7 @@ export default async function page({ params }: Props) {
         <div className="w-full md:w-[80%] md:px-5 overflow-hidden">
             <h1 className="text-lg sm:text-xl lg:text-2xl mb-5">Sub Categories in { category?.name }</h1>
             <ScrollArea className="w-full scroll whitespace-nowrap rounded-sm">
-              <div className="flex h-full space-x-4 rounded-sm">
+              <div className="flex h-full gap-4 rounded-sm">
                 {
                   category?.sub_categories?.map((scat, index)=>(
                     <Link key={ index } href={`/categories/${category.slug}/${scat.slug}`}>

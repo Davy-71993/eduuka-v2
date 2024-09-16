@@ -22,21 +22,35 @@ export default function StepThree({}: Props) {
   const [data, setData] = useState<AdData>()
   const [menuItem, setMenuItem] = useState<MenuItem>()
 
+  // To keep track of errrors from the price and price range
+  const [error, setError] = useState<any>()
+
   // Just to make sure we always have a proper price.
-  const validatePrices = useCallback(()=>{
-    if(data?.pricing_scheme === "price range"){
-      toNumber(data?.min_price)  >=  toNumber(data?.max_price)
-       ?setError({priceRange: 'The min price should not be zero (0.0) but sould be less than the max price'}) 
-       :setError({priceRange: undefined});
-    }else if(data?.pricing_scheme === "fixed price" || data?.pricing_scheme === "periodic price"){
-      (!data?.price || toNumber(data?.price) === 0)
-        ? setError({price: "You must provide a price greater than zero (0.0)"})
-        : setError({price: undefined});
-    }else{
-      setError(undefined)
+  const validatePrices = ()=>{
+    if(!data?.pricing_scheme){
+      return {...error, scheme: "You must select a pricing scheme of the ad."}
     }
-     
-  }, [data])
+    if(data?.pricing_scheme === "price range"){
+      if(toNumber(data?.min_price)  >=  toNumber(data?.max_price)){
+        return {...error, scheme: undefined,  priceRange: 'The min price should not be zero (0.0) but sould be less than the max price'} 
+      }else{
+        return {...error, scheme: undefined, priceRange: undefined}
+      }
+    }else if(data?.pricing_scheme === "fixed price" || data?.pricing_scheme === "periodic price"){
+      if(!data?.price || toNumber(data?.price) === 0){
+        return {...error, scheme: undefined, price: "You must provide a price greater than zero (0.0)"}
+      }else{
+        return {...error, scheme: undefined, price: undefined}
+      }
+
+    }else if(data.pricing_scheme === 'price menu'){
+      if(!data.menu_items || data.menu_items.length === 0){
+        return {...error, menu_items: 'You must provide atleast one menu item'}
+      }else{
+        return { ...error, menu_items: undefined }
+      }
+    }
+  }
   
   // Get data from the localstarge and set the initial state
   useEffect(()=>{
@@ -46,26 +60,19 @@ export default function StepThree({}: Props) {
       return 
     }
     setData({...JSON.parse(item), default_currency: geoData?.currency })
-    validatePrices()
-  }, [geoData, router, validatePrices])
-
-  // Run validations evrytime the price scheme changes
-  useEffect(()=>{
-    validatePrices()
-  }, [ data, validatePrices ])
-  
-  // To keep track of errrors from the price and price range
-  const [error, setError] = useState<{price?: string, priceRange?: string}>()
+  }, [geoData, router])
 
   /**
    * Handle navigation to next page.
    */
   const navigateToNextPage = () => {
-    if(error?.price || error?.priceRange){
-      console.log(error)
-      alert("Please check your form to eliminate the errors and try again.")
+    const error = validatePrices()
+    console.log(error)
+    if(error.price || error.priceRange || error.menu_items || error.scheme){
+      setError(error)
       return
     }
+    
     localStorage.setItem('ad_data', JSON.stringify(data))
     router.push('?cp=4')
   }
@@ -73,11 +80,15 @@ export default function StepThree({}: Props) {
   const addMenuItem = () => {
     if(menuItem?.item && menuItem.price){
       setData({...data, menu_items: [...data?.menu_items??[], menuItem], price: undefined})
+      setError({...error, menu_items: undefined})
     }
   }
 
   const removeMenuItem = (item: MenuItem) => {
     setData({...data, menu_items: data?.menu_items?.filter((it) => it !== item)})
+    if(!data?.menu_items || data.menu_items.length === 0){
+      setError({...error, menu_items: 'menu error'})
+    }
   }
 
   return (
@@ -93,21 +104,26 @@ export default function StepThree({}: Props) {
           required
           tip='Select the currency for your billing. Whenever you change your currency, please double 
           check your price to confirm that it is correct in accordance with the new currency you selected.' />
+        
       <FormGroup 
         label='Set a Pricing Scheme' 
-        className='h-fit sm:h-fit p-5' 
+        className={`h-fit sm:h-fit p-5 ${ error?.scheme && 'border-destructive'}`} 
         tip='Select the most appropriate pricing scheme for your product or service'>
         <RadioGroup 
           value={ data?.pricing_scheme ?? '' } 
-          onValueChange={ (e)=>{ setData({...data, pricing_scheme: e})} } 
+          onValueChange={ (e)=>{ setError({...error, scheme: undefined}); setData({...data, pricing_scheme: e})} } 
           className='flex flex-col gap-4 h-fit px-8'>
           {
-              [ "fixed price", "periodic price", "price range", "price menu"].map((radio, index) =>(
-                  <div key={index} className="flex items-center text-xl hover:text-primary transition-colors gap-4">
-                      <RadioGroupItem value={ radio } id={`r-${index}`} className='text-xl w-6 h-6'/>
-                      <Label htmlFor={`r-${index}`} className='capitalize text-xl'>{ radio }</Label>
-                  </div>
-              ))
+            error?.scheme &&
+            <p className="text-lg text-center text-destructive w-full">{ error.scheme}</p>
+          }
+          {
+            [ "fixed price", "periodic price", "price range", "price menu"].map((radio, index) =>(
+              <div key={index} className="flex items-center text-xl hover:text-primary transition-colors gap-4">
+                <RadioGroupItem value={ radio } id={`r-${index}`} className='text-xl w-6 h-6'/>
+                <Label htmlFor={`r-${index}`} className='capitalize text-xl'>{ radio }</Label>
+              </div>
+            ))
           }
         </RadioGroup>
       </FormGroup>
@@ -118,11 +134,11 @@ export default function StepThree({}: Props) {
         <FormGroup 
           label='Price' 
           required 
-          className={`${ error?.price && 'border-red-600'} h-fit sm:h-fit`}
+          className={`${ error?.price && 'border-destructive' } h-fit sm:h-fit`}
           tip='Enter a fixed price. This price can still be negotiable depending on settings in the details field.'>
           {
             error?.price &&
-            <p className="text-red-500 pt-5 px-8">{ error.price }</p>
+            <p className="text-destructive pt-5 px-8">{ error.price }</p>
           }
           <Input 
             type='number'
@@ -170,7 +186,7 @@ export default function StepThree({}: Props) {
       {
         data?.pricing_scheme === "periodic price" &&
         <>
-          <FormGroup label='Select your Pricing Period' className='h-fit sm:h-fit p-5 pt-10'>
+          <FormGroup label='Select your Pricing Period' className={`h-fit sm:h-fit p-5 pt-10`}>
             <FormRadioGroup
               radios={["daily", "monthly", "yearly"]}
               setter={ (period)=>{ setData({...data, pricing_period: period})} }
@@ -182,10 +198,10 @@ export default function StepThree({}: Props) {
           {
             data.pricing_period && data.pricing_period !== '' &&
             <FormGroup label={`Enter your ${data.pricing_period} Price`}
-              className={`${ error?.price && 'border-red-600'} h-fit sm:h-fit`}>
+              className={`${ error?.price && 'border-destructive'} h-fit sm:h-fit`}>
               {
                 error?.price &&
-                <p className="text-red-500 pt-5 px-8">{ error.price }</p>
+                <p className="text-destructive pt-5 px-8">{ error.price }</p>
               }
               <Input 
                 type='number'
@@ -203,7 +219,7 @@ export default function StepThree({}: Props) {
         data?.pricing_scheme === 'price menu' &&
         <FormGroup 
           label='Price Menu' 
-          className='p-5 h-fit sm:h-fit flex flex-col gap-3 items-center' 
+          className={`p-5 h-fit sm:h-fit flex flex-col gap-3 items-center ${error?.menu_items && 'border-destructive'}`} 
           tip='Add the menu items. Each menu item must have a price'>
             {
               data.menu_items?.length
@@ -212,14 +228,14 @@ export default function StepThree({}: Props) {
                 ))
               : (
                 <div className="h-24 w-full flex justify-center items-center">
-                  <p className="text-muted-foreground text-center w-2/3">
+                  <p className={`${ error?.menu_items ? 'text-destructive' : 'text-muted-foreground'} text-center w-2/3`}>
                   You {" don't "} have any menu items click the button bellow to add.
                   </p>
                 </div>
               )
             }
             <Dialog>
-              <DialogTrigger className='w-full max-w-60 bg-primary/40 hover:bg-primary/60 transition-colors mx-auto text-lg rounded-sm text-center py-2 px-5'>
+              <DialogTrigger className='w-full text-muted max-w-60 bg-primary hover:bg-primary/90 transition-colors mx-auto text-lg rounded-sm text-center py-2 px-5'>
                 Add Menu Item
               </DialogTrigger>
               <DialogContent className='p-5'>

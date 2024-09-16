@@ -1,4 +1,6 @@
 
+import Spinner from '@/components/animated/Spinner'
+import LoadingDots from '@/components/LoadingDots'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
@@ -10,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { MenuItem } from '@/lib/types'
 import { cn, displayCurrencyAndPrice } from '@/lib/utils'
 import { CircleHelp, X } from 'lucide-react'
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useCallback, useEffect, useState } from 'react'
 
 type FormSelectProps = {
     options: { name: string, value: string }[],
@@ -19,6 +21,7 @@ type FormSelectProps = {
     label?: string,
     tip?: string,
     required?: boolean
+    className?: string
 }
 
 type FormGroupProps = {
@@ -84,16 +87,23 @@ export const FormGroup = ({ children, label, className, tip, required, labelClas
     )
 }
 
-export const FormSelect = ({ label, value, options, setter, tip, required }: FormSelectProps) =>{
+export const FormSelect = ({ label, value, options, setter, tip, required, className }: FormSelectProps) =>{
   return (
-    <FormGroup label={ label } tip={ tip } required={ required } className=''>
+    <FormGroup label={ label } tip={ tip } required={ required } className={ className }>
         <Select onValueChange={(e)=>{ setter(e)}} value={ value }>
-            <SelectTrigger className="w-full sm:text-lg h-10 sm:h-12 px-8 py-1 bg-secondary border-none absolute left-0 bottom-0">
+            <SelectTrigger className="w-full text-sm sm:text-lg h-10 sm:h-12 px-8 py-1 bg-secondary border-none absolute left-0 bottom-0">
                 <SelectValue />
             </SelectTrigger>
-            <SelectContent className='p-5'>
+            <SelectContent className='p-5 max-w-full sm:text-lg'>
                 {
-                    options.map((option, index) =><SelectItem key={ index } value={ option.value }>{ option.name }</SelectItem>)
+                    options.map((option, index) =>(
+                        <SelectItem 
+                            key={ index } 
+                            className='w-full'
+                            value={ option.value }>
+                            { option.name }
+                        </SelectItem>
+                    ))
                 }
             </SelectContent>
         </Select>
@@ -124,12 +134,11 @@ export const FormRadioGroup = ({ radios, value, setter, includeCustomField }: Fo
     return (
         <>
             <RadioGroup value={ value ?? ''} onValueChange={(e)=>{ handleSetter(e) }} className='flex flex-col sm:flex-row py-5 sm:items-center h-fit sm:justify-between px-8 sm:space-x-2'>
-            
                 {
                     radioFields.map((radio, index) =>(
                         <div key={index} className="flex items-center space-x-2">
                             <RadioGroupItem value={ radio } id={`r-${index}`} />
-                            <Label htmlFor={`r-${index}`} className='capitalize'>{ radio }</Label>
+                            <Label htmlFor={`r-${index}`} className='capitalize text-sm sm:text-base lg:text-lg'>{ radio }</Label>
                         </div>
                     ))
                 }
@@ -151,46 +160,44 @@ export const FormRadioGroup = ({ radios, value, setter, includeCustomField }: Fo
     )
 }
 
-export const RenderExtraFields = ({fields, setter, initialData}: {fields: string, initialData: string, setter: (value:string) => void}) => {
-    const [fieldsArray, setFieldsArray] = useState(()=>{
-        if(!initialData) return fields.split(',')
-        let ar: string[] = []
+export const RenderExtraFields = ({fields, setter, initialData, className }: {fields: string, className?: string, initialData: string, setter: (value:any) => void}) => {
+    type Field = {field?: string, value?: string}
+    const [fieldsArray, setFieldsArray] = useState<string[]>([])
 
-        for (const key in JSON.parse(initialData)) {
-            ar.push(key)
-        }
-
-        return ar
-    })
     const [fieldsObject, setFieldsObject] = useState<any>(()=>{
         if(!initialData) return;
         
         return JSON.parse(initialData)
     })
-    const [newField, setNewField] = useState<{field?: string, value?: string}>()
-    // console.log(fieldsArray)
 
     useEffect(()=>{
-        const jsonString = JSON.stringify(fieldsObject)
-        setter(jsonString)
-    }, [fieldsObject, setter])
+        setFieldsArray(fields.split(','))
+    }, [fields])
 
-    const saveNewField = () => {
+    const [newField, setNewField] = useState<Field>()
+    
+    const saveNewField = useCallback(() => {
         if(newField?.field && newField.value){
             fieldsArray.push(newField.field)
             setFieldsObject({...fieldsObject, [newField.field]: newField.value })
+            setter(JSON.stringify({...fieldsObject, [newField.field]: newField.value }))
         }
+    }, [newField, fieldsArray, fieldsObject])
+
+    const handleChangeDetailField = (e: any, field: string) => { 
+        setFieldsObject({...fieldsObject, [field]: e.target.value})
+        setter(JSON.stringify({...fieldsObject, [field]: e.target.value}))
     }
    
     return (
-        <FormGroup label='Ad Details' className='h-fit sm:h-fit py-5 flex flex-wrap gap-3 sm:gap-5 justify-center'>
+        <FormGroup label='Ad Extra Details' className={`h-fit sm:h-fit p-5 flex flex-wrap gap-3 sm:gap-5 ${className}`}>
             {
                 fieldsArray.map((field, index)=>(
                     <div key={ index } className="w-fit flex flex-col items-center">
                         <Input 
                             className='border-b-2 rounded-none text-center w-36 bg-secondary' 
                             value={fieldsObject ? fieldsObject[field] ?? '' : ''} 
-                            onChange={(e) => { setFieldsObject({...fieldsObject, [field]: e.target.value})} }/>
+                            onChange={ (e)=>{ handleChangeDetailField(e, field) } }/>
                         <Label className='text-accent-foreground/50 capitalize'>{ field }</Label>
                     </div>
                 ))
@@ -239,13 +246,20 @@ export const RenderExtraFields = ({fields, setter, initialData}: {fields: string
     )
 }
 
-export const MenuPriceItem = ({ item, default_currency, onclose }: { item: MenuItem, default_currency: string, onclose:(e: MenuItem)=> void }) => {
+export const MenuPriceItem = ({ item, default_currency, onclose, deleting }: { deleting?: boolean, item: MenuItem, default_currency: string, onclose:(e: MenuItem)=> void }) => {
     const [hidden, setHidden] = useState('hidden')
+    if(deleting){
+        return (
+            <div className="w-full py-4 rounded-sm bg-primary/10 animate-pulse"> 
+                <Spinner variant='danger' size='sm' text='Deleting' />
+            </div>
+        )
+    }
      return (
         <div onMouseLeave={ ()=>{ setHidden('hidden') } } onMouseEnter={ ()=>{ setHidden('') } } className="gap-1 w-full border rounded-sm px-3 py-4 hover:bg-primary/15 bg-primary/10 relative mt-5">
             <X size={24}
                 onClick={ ()=>{onclose(item)} } 
-                className={`border ${hidden} border-destructive absolute -top-2 -right-2 self-end rounded-full text-destructive`} />
+                className={`${hidden} absolute -top-2 -right-2 self-end rounded-full text-destructive bg-primary/15 p-1`} />
             <div className="flex gap-2 w-full ">
                 <p className="text-lg w-full">{ item.item } {`->`}</p> 
                 <h1 className="text-lg w-full text-right">{displayCurrencyAndPrice(default_currency, default_currency, item.price!)}</h1>

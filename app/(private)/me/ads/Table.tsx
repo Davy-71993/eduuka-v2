@@ -39,6 +39,8 @@ import { Ad } from "@/lib/types"
 import Link from "next/link"
 import { ActionButton } from "@/components/ActionButton"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { updateAds } from "@/lib/actions/db_actions"
+import { useRouter } from "next/navigation"
 
 export const columns: ColumnDef<Ad>[] = [
   {
@@ -123,7 +125,9 @@ export const columns: ColumnDef<Ad>[] = [
     accessorKey: "created_at",
     header: "Date Created",
     cell: ({ row }) => (
-      <div className="">{row.getValue("created_at")}</div>
+      <div className="">
+        { new Date(row.getValue("created_at")).toDateString() }
+      </div>
     ),
   },
   {
@@ -155,19 +159,26 @@ export const columns: ColumnDef<Ad>[] = [
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="flex flex-col space-y-3">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel className="pb-0 mb-0">Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="hover:bg-transparent p-0">
-              <ActionButton action={()=>{}} title="Edit" Icon={Pencil} className="w-full bg-foreground/30 hover:bg-foreground/35" />
-            </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-transparent p-0">
-              <ActionButton action={()=>{}} title="Delete" className="w-full bg-red-500 hover:bg-red-600" Icon={Trash} />
-            </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-transparent p-0">
-              <ActionButton className="bg-green-500 text-primary-foreground w-full hover:bg-green-600" action={()=>{}} title="Mark as sold" Icon={CircleCheckBig} />
-            </DropdownMenuItem>
+              <div className="p-5 flex flex-col gap-3">
+                <DropdownMenuItem className="hover:bg-transparent p-0 rounded-none">
+                  <Link href={`/me/ads?aid=${ ad.id }`} className="w-full">
+                    <ActionButton action={()=>{ }} title="Edit" Icon={Pencil} className="w-full rounded bg-foreground/30 hover:bg-foreground/35" />
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-transparent p-0 rounded-none">
+                  <ActionButton 
+                    className="bg-green-500 text-primary-foreground w-full rounded hover:bg-green-600" 
+                    action={()=>{ updateAds([{...ad, status: 'Sold'}]) }} 
+                    title="Mark as sold" 
+                    Icon={CircleCheckBig} />
+                </DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-transparent  p-0 rounded-none">
+                  <ActionButton action={()=>{ updateAds([{...ad, trashed_at: new Date() }]) }} title="Delete" className="w-full rounded bg-destructive hover:bg-destructive/80" Icon={Trash} />
+                </DropdownMenuItem>
+              </div>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -181,6 +192,8 @@ export default function AdsTable({ ads }: { ads: Ad[]}) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [selectedAds, setSelectedAds] = React.useState<Ad[]>([])
+
+  const router = useRouter()
 
   const table = useReactTable({
     data: ads,
@@ -200,11 +213,7 @@ export default function AdsTable({ ads }: { ads: Ad[]}) {
       rowSelection,
     },
   })
-
-  React.useEffect(()=>{
-    console.log(selectedAds)
-  }, [selectedAds])
-
+  
   React.useEffect(()=>{
     const adsRows = table.getSelectedRowModel().rows.map((row) => row.original)
     setSelectedAds(adsRows)
@@ -213,7 +222,7 @@ export default function AdsTable({ ads }: { ads: Ad[]}) {
   return (
     <div className="w-full">
       <ScrollArea>
-        <div className="flex space-x-2 sm:space-x-5 items-center justify-between py-4">
+        <div className="flex space-x-2 sm:space-x-5 items-center justify-between pb-5">
           <Input
             placeholder="Filter by ad names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -227,10 +236,28 @@ export default function AdsTable({ ads }: { ads: Ad[]}) {
               <div className="w-full flex space-x-2 justify-end">
                 {
                   selectedAds.length === 1 &&
-                  <ActionButton action={()=>{}} title="Edit" Icon={Pencil} className="w-fit bg-foreground/30 hover:bg-foreground/35" />
+                  <Link href={`/me/ads?aid=${selectedAds[0].id}`}>
+                    <ActionButton action={()=>{}} title="Edit" Icon={Pencil} className="w-fit bg-foreground/30 hover:bg-foreground/35" />
+                  </Link>
                 }
-                <ActionButton action={()=>{}} title="Delete" Icon={Trash} className="bg-red-500 hover:bg-red-600" />
-                <ActionButton className="bg-green-500 hover:bg-green-600 text-primary-foreground" action={()=>{}} title="Mark as sold" Icon={CircleCheckBig} />
+                <ActionButton 
+                  className="bg-green-500 hover:bg-green-600 text-primary-foreground" 
+                  action={()=>{
+                    updateAds(selectedAds.map(ad => ({...ad, status: 'Sold'})))
+                    table.setRowSelection({})
+                    router.push('')
+                  }} 
+                  title="Mark as sold" 
+                  Icon={CircleCheckBig} />
+                <ActionButton 
+                  action={()=>{
+                    updateAds(selectedAds.map(ad => ({...ad, trashed_at: new Date() })))
+                    table.setRowSelection({})
+                    router.push('')
+                  }} 
+                  title="Delete" 
+                  Icon={Trash} 
+                  className="bg-red-500 hover:bg-red-600" />
               </div>
           }
           <DropdownMenu>
@@ -289,6 +316,7 @@ export default function AdsTable({ ads }: { ads: Ad[]}) {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     className="hover:bg-secondary"
+                    onClick={(e)=>{ row.toggleSelected(!row.getIsSelected()) }}
                     >
                     {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>

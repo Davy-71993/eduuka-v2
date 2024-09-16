@@ -24,7 +24,7 @@ export default function AdsList({ c, sc}: { c?: string, sc?: string}) {
     setCurrency(geoData?.currency ?? 'USD')
   }, [geoData])
 
-  if(loading){
+  if(loading || !ads){
     return (
       <AdListSkelton />
     )

@@ -22,8 +22,10 @@ export default async function FindPage() {
   
   return (
     <Container clasName="">
-      <div className="fixed w-full max-w-[90rem] z-[60] bg-background -mt-5 pb-3 pt-5">
-        <SearchBar includeLocation />
+      <div className="fixed bg-background w-full z-[60] left-0 flex justify-center -mt-5 pb-3 pt-5">
+        <Container>
+          <SearchBar includeLocation />
+        </Container>
       </div>
       <div className="flex py-16 w-full">
         {/* Filters */}
