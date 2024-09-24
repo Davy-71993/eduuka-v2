@@ -1,8 +1,12 @@
 import React from 'react';
 import Container from '../Container';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { APP_NAME } from '@/lib/defaults';
+import { APP_NAME } from '@/lib/defaults';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const Footer = () => {
   return (
@@ -18,6 +22,17 @@ const Footer = () => {
                 <div className="flex flex-col w-full gap-5">
                     <Link className='w-full' href='https://apple.com'>
                         <div className="w-full bg-teal-500 rounded px-5 py-2 flex justify-center gap-2 items-center">
+
+        <div className="flex w-full">
+            <div className="flex flex-col w-full">
+                <div className="flex gap-2 items-center">
+                    <Image className="w-10 h-10" src='/android-chrome-512x512.png' alt='logo' height={100} width={100} />
+                    <h1 className="text-2xl font-bold uppercase">{ APP_NAME }</h1>
+                </div>
+                <p className="py-2">Download mobile app.</p>
+                <div className="flex w-full gap-5">
+                    <Link href='https://apple.com'>
+                        <div className="w-full bg-teal-500 rounded p-5 flex justify-center gap-2 items-center">
                             <svg  
                                 version="1.1" 
                                 fill='#e2e8f0'
@@ -39,6 +54,7 @@ const Footer = () => {
                             </svg>
                             <div className="flex flex-col w-fit">
                                 <p className="text-sm line-clamp-1">Download from</p>
+                                <p className="text">Download from</p>
                                 <p className="text-lg font-bold">AppStore</p>
                             </div>
                         </div>
@@ -46,6 +62,9 @@ const Footer = () => {
                     <Link className='w-full' href='https://google.com'>
                         <div className="w-full bg-slate-500 rounded px-5 py-2 flex justify-center gap-2 items-center">
                         <svg fill="#f0fdfa" className='h-10 w-10' viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                    <Link href='https://google.com'>
+                        <div className="w-full bg-slate-500 rounded p-5 flex justify-center gap-2 items-center">
+                        <svg fill="#f0fdfa" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
                             <g id="SVGRepo_iconCarrier">
@@ -58,6 +77,7 @@ const Footer = () => {
                         </svg>
                             <div className="flex flex-col w-fit">
                                 <p className="text-sm line-clamp-1">Download from</p>
+                                <p className="text">Download from</p>
                                 <p className="text-lg font-bold">PlayStore</p>
                             </div>
                         </div>

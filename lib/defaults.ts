@@ -1,6 +1,6 @@
 import { Bell, Home, MessageSquareQuote, SendHorizonal, Store, Trash, Weight } from "lucide-react"
 
-export const APP_NAME = 'uDuuka'
+export const APP_NAME = 'Assubo'
 export const APP_URL = 'http://localhost:3000'
 export const CDN_URL = 'https://sqcidocbglgivrlysuhq.supabase.co/storage/v1/object/public'
 

@@ -56,7 +56,7 @@ const Footer = () => {
                 </div>
                 <FadingLine/>
                 <h4 className="text-sm text-center pb-5">Copyright &copy; 2023 DolineShop Inc. All rights reserved</h4>
-        </>
+            </>
         </Container>
     </div>
   )
