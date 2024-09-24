@@ -1,5 +1,9 @@
 import React from 'react';
 import Container from '../Container';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { APP_NAME } from '@/lib/defaults';
 import { APP_NAME } from '@/lib/defaults';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,6 +12,17 @@ const Footer = () => {
   return (
     <footer id='footer' className='w-full bg-primary min-h-96'>
       <Container clasName='py-10 text-background'>
+        <div className="flex gap-2 items-center">
+            <Image className="w-10 h-10" src='/android-chrome-512x512.png' alt='logo' height={100} width={100} />
+            <h1 className="text-2xl font-bold uppercase">{ APP_NAME }</h1>
+        </div>
+        <div className="flex w-full gap-5">
+            <div className="flex flex-col w-full">
+                <p className="py-2 text-center w-full text-lg">Download mobile app.</p>
+                <div className="flex flex-col w-full gap-5">
+                    <Link className='w-full' href='https://apple.com'>
+                        <div className="w-full bg-teal-500 rounded px-5 py-2 flex justify-center gap-2 items-center">
+
         <div className="flex w-full">
             <div className="flex flex-col w-full">
                 <div className="flex gap-2 items-center">
@@ -38,11 +53,15 @@ const Footer = () => {
                                     </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> </g> </g>
                             </svg>
                             <div className="flex flex-col w-fit">
+                                <p className="text-sm line-clamp-1">Download from</p>
                                 <p className="text">Download from</p>
                                 <p className="text-lg font-bold">AppStore</p>
                             </div>
                         </div>
                     </Link>
+                    <Link className='w-full' href='https://google.com'>
+                        <div className="w-full bg-slate-500 rounded px-5 py-2 flex justify-center gap-2 items-center">
+                        <svg fill="#f0fdfa" className='h-10 w-10' viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
                     <Link href='https://google.com'>
                         <div className="w-full bg-slate-500 rounded p-5 flex justify-center gap-2 items-center">
                         <svg fill="#f0fdfa" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -57,11 +76,26 @@ const Footer = () => {
                             </g>
                         </svg>
                             <div className="flex flex-col w-fit">
+                                <p className="text-sm line-clamp-1">Download from</p>
                                 <p className="text">Download from</p>
                                 <p className="text-lg font-bold">PlayStore</p>
                             </div>
                         </div>
                     </Link>
+                </div>
+            </div>
+            <div className="flex w-full gap-5">
+                <div className="flex flex-col gap-2 group">
+                    <div className="w-full">
+                        <h2 className='py-2 text-lg'>Learn how to...</h2>
+                        <div className="w-10 border-b-2 border-background group-hover:w-full transition-all duration-300"></div>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-2 group">
+                    <div className="w-full">
+                        <h2 className='py-2 text-lg'>Useful Links</h2>
+                        <div className="w-10 border-b-2 border-background group-hover:w-full transition-all duration-300"></div>
+                    </div>
                 </div>
             </div>
         </div>
