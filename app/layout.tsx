@@ -4,7 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/providers/theme-provider";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/layout/Footer";
+import Footer from "@/components/Footer";
 import Chat from "@/components/chat/Chat";
 import WithContext from "@/context/WithContext";
 import { siteConfig } from "@/config/site";
